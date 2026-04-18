@@ -247,14 +247,16 @@ export function HomePage() {
       >
         <div className="container-shell flex min-w-0 max-w-full flex-col px-6 py-4 md:px-8">
           <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-3">
-            {/* Logo */}
-            <motion.div
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="min-w-0 break-words font-display text-xl font-black leading-snug tracking-tight text-primary md:text-2xl"
-            >
-              {data.profile.fullName}
-            </motion.div>
+            {/* Row: name + desktop nav + CTA — mobile uses inner row (name | CTA) via md:contents */}
+            <div className="flex w-full min-w-0 flex-row items-center justify-between gap-2 md:contents">
+              {/* Logo */}
+              <motion.div
+                initial={{ opacity: 0, x: -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="min-w-0 flex-1 break-words font-display text-xl font-black leading-snug tracking-tight text-primary md:flex-none md:text-2xl"
+              >
+                {data.profile.fullName}
+              </motion.div>
 
             {/* Navigation — desktop */}
             <nav
@@ -296,7 +298,7 @@ export function HomePage() {
             <motion.div
               initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
-              className="shrink-0 self-start md:self-center"
+              className="shrink-0 md:self-center"
             >
               <Button
                 href={data.profile.heroPrimaryCtaLink}
@@ -307,11 +309,12 @@ export function HomePage() {
                 {data.profile.heroPrimaryCtaLabel.trim() || t("hero.ctaFallbackPrimary")}
               </Button>
             </motion.div>
+            </div>
           </div>
 
-          {/* Navigation — mobile (in-page anchors only; homestay details via “View full stay”) */}
+          {/* Navigation — mobile: one row, no horizontal scroll (5 equal columns) */}
           <nav
-            className="-mx-2 mt-3 flex min-w-0 w-full max-w-full flex-wrap gap-1.5 pb-1 pt-1 md:hidden"
+            className="mt-3 grid w-full grid-cols-5 gap-1 border-b border-outline-variant/15 pb-3 md:hidden"
             aria-label="Section navigation"
           >
             {navItems.map((item) => (
@@ -319,13 +322,13 @@ export function HomePage() {
                 key={`mobile-${item.id}`}
                 href={item.href}
                 onClick={handleNavClick(item)}
-                className={`rounded-full px-3 py-2 text-xs font-semibold transition-colors ${
+                className={`flex min-h-[2.5rem] min-w-0 items-center justify-center rounded-full px-0.5 py-2 text-center text-[10px] font-semibold leading-tight transition-colors sm:text-[11px] ${
                   activeNavId === item.id
                     ? "bg-primary/12 text-primary"
                     : "bg-on-surface/[0.04] text-on-surface/70 hover:bg-primary/8 hover:text-primary"
                 }`}
               >
-                {item.label}
+                <span className="line-clamp-2 break-words">{item.label}</span>
               </a>
             ))}
           </nav>

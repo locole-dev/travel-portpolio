@@ -10,6 +10,7 @@
     "lint": "eslint src prisma scripts --ext .ts",
     "smoke": "tsx scripts/smoke-test.ts",
     "backfill:vi": "tsx scripts/backfill-vi-content.ts",
+    "check:vi": "tsx scripts/check-vi-filled.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",

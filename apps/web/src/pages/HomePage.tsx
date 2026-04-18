@@ -424,13 +424,13 @@ export function HomePage() {
               initial={{ opacity: 0, scale: 0.92, rotate: -2 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-              className="relative order-1 mx-auto w-full max-w-[240px] overflow-hidden sm:max-w-[300px] lg:order-2 lg:max-w-[460px]"
+              className="relative order-1 mx-auto w-full max-w-[240px] overflow-hidden rounded-full sm:max-w-[300px] lg:order-2 lg:max-w-[460px] lg:rounded-[2.5rem]"
             >
               {/* Decorative blobs */}
               <div className="absolute -left-6 top-4 h-32 w-32 rounded-full bg-[#fda874]/40 blur-2xl lg:-left-12 lg:top-8 lg:h-48 lg:w-48 lg:blur-3xl" />
               <div className="absolute -bottom-6 -right-6 h-40 w-40 rounded-full bg-[#f472b6]/30 blur-2xl lg:-bottom-12 lg:-right-8 lg:h-56 lg:w-56 lg:blur-3xl" />
 
-              <div className="relative overflow-hidden rounded-full border-[6px] border-white/90 bg-white shadow-xl shadow-primary/10 lg:rounded-[2.5rem] lg:border-[10px] lg:border-white/60 lg:shadow-[0_24px_72px_rgba(28,26,65,0.14)]">
+              <div className="relative z-[1] overflow-hidden rounded-full border-[6px] border-white/90 bg-white shadow-xl shadow-primary/10 lg:rounded-[2.5rem] lg:border-[10px] lg:border-white/60 lg:shadow-[0_24px_72px_rgba(28,26,65,0.14)]">
                 <img
                   src={heroAvatar}
                   alt={data.profile.fullName}

@@ -1,4 +1,6 @@
 # API + web only. Use an existing PostgreSQL — set DATABASE_URL in `.env`.
+# RUN_DB_SEED defaults to false so redeploys do not reset site content (seed upserts overwrite rows).
+# Empty DB first time: set RUN_DB_SEED=true in `.env`, `docker compose up` once, then set false again.
 services:
   api:
     build:
@@ -19,7 +21,7 @@ services:
       SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@twentyninehomestay.local}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-ChangeMe123!}
       RUN_DB_PUSH: ${RUN_DB_PUSH:-true}
-      RUN_DB_SEED: ${RUN_DB_SEED:-true}
+      RUN_DB_SEED: ${RUN_DB_SEED:-false}
     ports:
       - "${API_PORT_FORWARD:-4001}:4000"
     volumes:

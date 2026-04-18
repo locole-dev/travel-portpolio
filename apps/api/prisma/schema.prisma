@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  ADMIN
+  SUPER_ADMIN
+}
+
+model Profile {
+  id                    String   @id
+  fullName              String
+  title                 String
+  shortIntro            String
+  avatarImage           String?
+  heroPrimaryCtaLabel   String
+  heroPrimaryCtaLink    String
+  heroSecondaryCtaLabel String
+  heroSecondaryCtaLink  String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model ContactMethod {
+  id        String   @id @default(cuid())
+  platform  String
+  label     String
+  value     String?
+  link      String
+  icon      String
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sortOrder])
+}
+
+model HomestaySection {
+  id                 String          @id
+  title              String
+  previewDescription String @default("")
+  description        String
+  isActive           Boolean         @default(true)
+  /// WGS84 — set together with longitude for map embed
+  latitude           Float?
+  longitude          Float?
+  locationLabel      String?
+  seasonalRatesNote  String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  images      HomestayImage[]
+}
+
+model HomestayImage {
+  id                String          @id @default(cuid())
+  homestaySectionId String
+  imageUrl          String
+  altText           String
+  sortOrder         Int             @default(0)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  homestaySection   HomestaySection @relation(fields: [homestaySectionId], references: [id], onDelete: Cascade)
+
+  @@index([sortOrder])
+  @@index([homestaySectionId, sortOrder])
+}
+
+model ServiceItem {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  icon        String
+  ctaLabel    String?
+  ctaLink     String?
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sortOrder])
+}
+
+model ClosingSection {
+  id        String   @id
+  title     String
+  message   String
+  ctaLabel  String
+  ctaLink   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdminUser {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  passwordHash  String
+  role          AdminRole    @default(SUPER_ADMIN)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  uploadedMedia MediaAsset[]
+}
+
+model MediaAsset {
+  id           String    @id @default(cuid())
+  fileName     String
+  originalName String
+  mimeType     String
+  fileSize     Int
+  storagePath  String
+  publicUrl    String    @unique
+  altText      String?
+  uploadedById String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  uploadedBy   AdminUser? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([uploadedById])
+}

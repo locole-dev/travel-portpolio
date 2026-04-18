@@ -1,0 +1,38 @@
+{
+  "name": "twentynine-homestay-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "scripts": {
+    "dev:web": "npm --workspace apps/web run dev",
+    "dev:api": "npm --workspace apps/api run dev",
+    "build:web": "npm --workspace apps/web run build",
+    "build:api": "npm --workspace apps/api run build",
+    "build": "npm run build:web && npm run build:api",
+    "lint:web": "npm --workspace apps/web run lint",
+    "lint:api": "npm --workspace apps/api run lint",
+    "lint": "npm run lint:web && npm run lint:api",
+    "typecheck:web": "npm --workspace apps/web run typecheck",
+    "typecheck:api": "npm --workspace apps/api run typecheck",
+    "typecheck": "npm run typecheck:web && npm run typecheck:api",
+    "test:web": "npm --workspace apps/web run test --if-present",
+    "test:api": "npm --workspace apps/api run test --if-present",
+    "test": "npm run test:web && npm run test:api",
+    "smoke:api": "npm --workspace apps/api run smoke",
+    "prisma:generate": "npm --workspace apps/api run prisma:generate",
+    "prisma:migrate": "npm --workspace apps/api run prisma:migrate",
+    "prisma:seed": "npm --workspace apps/api run prisma:seed"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "@locole/locole-skills": "^0.2.1",
+    "@types/node": "^24.0.0",
+    "eslint": "^9.15.0",
+    "globals": "^16.0.0",
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.18.0"
+  }
+}

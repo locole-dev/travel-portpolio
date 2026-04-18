@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #7c3bed;
+  --color-primary-soft: rgba(124, 59, 237, 0.1);
+  --color-primary-container: #a690ff;
+  --color-primary-dim: #6148c2;
+
+  --color-secondary: #006479;
+  --color-secondary-container: #77dfff;
+  --color-secondary-dim: #00576a;
+
+  --color-tertiary: #a03a0f;
+  --color-tertiary-container: #ff946e;
+  --color-tertiary-dim: #902e02;
+
+  --color-surface: #fcf9f3;
+  --color-surface-container: #f7f1eb;
+  --color-surface-container-low: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-highest: #e3dcd4;
+
+  --color-on-surface: #1a1a1a;
+  --color-on-primary: #ffffff;
+  
+  --color-outline-variant: #e2e8f0;
+
+  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Plus Jakarta Sans", sans-serif;
+
+  --radius-pill: 9999px;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+
+  --shadow-ambient: 0 4px 20px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.03);
+}
+
+
+:root {
+  font-family: var(--font-sans);
+  color: var(--color-on-surface);
+  background-color: var(--color-surface);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  background-color: rgba(96, 70, 189, 0.2);
+}
+
+.container-shell {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+/* Glass & Gradient Rule */
+.glass-header {
+  @apply bg-surface/70 backdrop-blur-[20px];
+}
+
+/* Cards: The "Feature" Container */
+.glass-card {
+  @apply rounded-lg border-none bg-surface-container-low shadow-ambient transition duration-300 hover:bg-surface-container-lowest hover:scale-[1.02];
+}
+
+/* Old compatibility class just in case it's used heavily */
+/* I will update them, but let's keep it functional if I miss something */
+.bg-cream {
+  @apply bg-surface;
+}
+.text-plum {
+  @apply text-on-surface;
+}
+.border-white\/60 {
+  @apply border-none;
+}
+
+.section-heading {
+  @apply font-display text-5xl leading-tight text-on-surface tracking-tight;
+}
+
+.section-label {
+  @apply font-sans text-sm font-semibold text-tertiary uppercase tracking-wider mb-2 block;
+}
+
+.section-copy {
+  @apply font-sans text-base leading-relaxed text-on-surface sm:text-lg;
+}
+
+.input-base {
+  @apply w-full rounded-md bg-surface-container-highest border border-outline-variant/15 px-4 py-3 text-on-surface outline-none transition duration-200 focus:border-primary focus:border-[1.5px];
+}
+
+.checkbox-base {
+  @apply h-5 w-5 rounded border-outline-variant/15 text-primary focus:ring-primary;
+}
+
+/* Buttons: The Pill Shape */
+.button-primary {
+  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-pill bg-primary px-6 py-3 font-semibold text-on-primary shadow-ambient transition-transform duration-200 hover:scale-105;
+}
+
+.button-secondary {
+  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-pill bg-surface-container-highest px-6 py-3 font-semibold text-on-surface transition-transform duration-200 hover:scale-105 border-transparent border;
+}
+
+.button-danger {
+  @apply inline-flex cursor-pointer items-center justify-center gap-2 rounded-pill bg-tertiary px-6 py-3 font-semibold text-on-primary transition duration-200 hover:bg-tertiary-dim;
+}
+
+.chip {
+  @apply inline-flex items-center rounded-full bg-secondary-container px-3 py-1 text-sm font-medium text-on-surface;
+}
+
+.floating-shape {
+  animation: drift 8s ease-in-out infinite;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+.env
+.env.local
+.env.production
+apps/api/uploads/*
+!apps/api/uploads/.gitkeep
+!apps/api/uploads/*.svg
+*.log

@@ -1,0 +1,12 @@
+.agent
+.codex
+.git
+node_modules
+**/node_modules
+**/dist
+coverage
+*.log
+apps/api/.env
+apps/api/src/.env
+apps/web/.env
+uploads

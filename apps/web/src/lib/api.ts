@@ -5,7 +5,12 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ??
   "http://localhost:4000/api/v1";
 
-const API_ORIGIN = new URL(API_BASE_URL).origin;
+/** Same-origin relative base (e.g. `/api/v1`) cannot be passed to `new URL()` alone. */
+const API_ORIGIN = /^https?:\/\//i.test(API_BASE_URL)
+  ? new URL(API_BASE_URL).origin
+  : typeof window !== "undefined"
+    ? window.location.origin
+    : "http://localhost:5173";
 const MOCK_API_ENABLED = import.meta.env.VITE_ENABLE_MOCK_API === "true";
 
 type ApiEnvelope<TData> = {

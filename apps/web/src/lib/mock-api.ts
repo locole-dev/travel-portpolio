@@ -9,6 +9,7 @@ import type {
   ServiceItem,
   SiteContent
 } from "../types/content";
+import { contactCtaLabel } from "./contact-cta-label";
 import { ApiError } from "./api-error";
 
 type MockState = {
@@ -40,6 +41,8 @@ function createDefaultMockState(): MockState {
       heroPrimaryCtaLink: "https://wa.me/855000000000",
       heroSecondaryCtaLabel: "See the Homestay",
       heroSecondaryCtaLink: "#homestay",
+      heroPrimaryContactId: "contact-whatsapp",
+      heroSecondaryContactId: null,
       updatedAt: createdAt
     },
     contacts: [
@@ -337,6 +340,14 @@ function loadMockState(): MockState {
     return initialState;
   }
 
+  const isHeroContactFk = window.localStorage.getItem("twentynine.mock.upgraded_v8_hero_contact_fk");
+  if (!isHeroContactFk) {
+    const initialState = createDefaultMockState();
+    window.localStorage.setItem(MOCK_STATE_KEY, JSON.stringify(initialState));
+    window.localStorage.setItem("twentynine.mock.upgraded_v8_hero_contact_fk", "true");
+    return initialState;
+  }
+
   const raw = window.localStorage.getItem(MOCK_STATE_KEY);
 
   if (!raw) {
@@ -386,9 +397,44 @@ function requireMockAuth() {
   return user;
 }
 
+/** Match public API: strip FKs and resolve hero CTAs from linked active contacts. */
+function materializePublicProfile(profile: Profile, contacts: ContactMethod[]): Profile {
+  const byId = new Map(contacts.map((c) => [c.id, c]));
+  let heroPrimaryCtaLabel = profile.heroPrimaryCtaLabel;
+  let heroPrimaryCtaLink = profile.heroPrimaryCtaLink;
+  if (profile.heroPrimaryContactId) {
+    const c = byId.get(profile.heroPrimaryContactId);
+    if (c?.isActive) {
+      heroPrimaryCtaLabel = contactCtaLabel(c);
+      heroPrimaryCtaLink = c.link;
+    }
+  }
+  let heroSecondaryCtaLabel = profile.heroSecondaryCtaLabel;
+  let heroSecondaryCtaLink = profile.heroSecondaryCtaLink;
+  if (profile.heroSecondaryContactId) {
+    const c = byId.get(profile.heroSecondaryContactId);
+    if (c?.isActive) {
+      heroSecondaryCtaLabel = contactCtaLabel(c);
+      heroSecondaryCtaLink = c.link;
+    }
+  }
+  const {
+    heroPrimaryContactId: _primaryFk,
+    heroSecondaryContactId: _secondaryFk,
+    ...rest
+  } = profile;
+  return {
+    ...rest,
+    heroPrimaryCtaLabel,
+    heroPrimaryCtaLink,
+    heroSecondaryCtaLabel,
+    heroSecondaryCtaLink
+  };
+}
+
 function buildPublicSiteContent(state: MockState): SiteContent {
   return {
-    profile: state.profile,
+    profile: materializePublicProfile(state.profile, state.contacts),
     contacts: state.contacts
       .filter((item) => item.isActive)
       .sort((left, right) => left.sortOrder - right.sortOrder),
@@ -469,7 +515,7 @@ export async function handleMockApiRequest<TData>(
   }
 
   if (path === "/public/profile" && method === "GET") {
-    return state.profile as TData;
+    return materializePublicProfile(state.profile, state.contacts) as TData;
   }
 
   if (path === "/public/contacts" && method === "GET") {

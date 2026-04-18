@@ -13,7 +13,9 @@ const profileSchema = z.object({
   heroPrimaryCtaLabel: z.string().trim().min(2).max(60),
   heroPrimaryCtaLink: z.string().trim().min(1).max(300),
   heroSecondaryCtaLabel: z.string().trim().min(2).max(60),
-  heroSecondaryCtaLink: z.string().trim().min(1).max(300)
+  heroSecondaryCtaLink: z.string().trim().min(1).max(300),
+  heroPrimaryContactId: z.union([z.string().trim().min(1).max(80), z.null()]),
+  heroSecondaryContactId: z.union([z.string().trim().min(1).max(80), z.null()])
 });
 
 export const profileRoutes = Router();

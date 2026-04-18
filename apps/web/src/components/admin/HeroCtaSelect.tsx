@@ -1,35 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, Link2 } from "lucide-react";
 
+import { contactCtaLabel } from "../../lib/contact-cta-label";
 import { getIcon } from "../../lib/icons";
 import type { ContactMethod } from "../../types/content";
 
 export type HeroCtaPreset = { id: string; label: string; link: string };
 
-const EMAIL_PLATFORMS = new Set(["mail", "email", "gmail"]);
-
-function humanizePlatform(platform: string): string {
-  const p = platform.toLowerCase();
-  const map: Record<string, string> = {
-    whatsapp: "WhatsApp",
-    kakaotalk: "KakaoTalk",
-    zalo: "Zalo",
-    line: "Line",
-    instagram: "Instagram",
-    wechat: "WeChat",
-    gmail: "Gmail",
-    mail: "Email",
-    email: "Email"
-  };
-  return map[p] ?? platform.charAt(0).toUpperCase() + platform.slice(1).toLowerCase();
-}
-
-/** Label shown in hero CTA for a contact (saved with profile). */
-export function contactCtaLabel(c: ContactMethod): string {
-  const p = c.platform.toLowerCase();
-  if (EMAIL_PLATFORMS.has(p)) return "Send email";
-  return `Chat on ${humanizePlatform(c.platform)}`;
-}
+export { contactCtaLabel };
 
 function triggerLabel(
   value: string,

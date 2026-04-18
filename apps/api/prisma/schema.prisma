@@ -13,30 +13,36 @@ enum AdminRole {
 }
 
 model Profile {
-  id                    String   @id
-  fullName              String
-  title                 String
-  shortIntro            String
-  avatarImage           String?
-  heroPrimaryCtaLabel   String
-  heroPrimaryCtaLink    String
-  heroSecondaryCtaLabel String
-  heroSecondaryCtaLink  String
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                       String          @id
+  fullName                 String
+  title                    String
+  shortIntro               String
+  avatarImage              String?
+  heroPrimaryCtaLabel      String
+  heroPrimaryCtaLink       String
+  heroSecondaryCtaLabel    String
+  heroSecondaryCtaLink     String
+  heroPrimaryContactId     String?
+  heroSecondaryContactId   String?
+  heroPrimaryContact       ContactMethod?  @relation("ProfileHeroPrimary", fields: [heroPrimaryContactId], references: [id], onDelete: SetNull)
+  heroSecondaryContact     ContactMethod?  @relation("ProfileHeroSecondary", fields: [heroSecondaryContactId], references: [id], onDelete: SetNull)
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
 }
 
 model ContactMethod {
-  id        String   @id @default(cuid())
-  platform  String
-  label     String
-  value     String?
-  link      String
-  icon      String
-  isActive  Boolean  @default(true)
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                     String    @id @default(cuid())
+  platform               String
+  label                  String
+  value                  String?
+  link                   String
+  icon                   String
+  isActive               Boolean   @default(true)
+  sortOrder              Int       @default(0)
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+  profileAsHeroPrimary   Profile[] @relation("ProfileHeroPrimary")
+  profileAsHeroSecondary Profile[] @relation("ProfileHeroSecondary")
 
   @@index([sortOrder])
 }

@@ -21,7 +21,9 @@ const profileData = {
   heroPrimaryCtaLabel: "Chat on WhatsApp",
   heroPrimaryCtaLink: "https://wa.me/855000000000",
   heroSecondaryCtaLabel: "See the Homestay",
-  heroSecondaryCtaLink: "#homestay"
+  heroSecondaryCtaLink: "#homestay",
+  heroPrimaryContactId: "contact-whatsapp",
+  heroSecondaryContactId: null
 };
 
 const homestayPreview =
@@ -281,12 +283,6 @@ async function main() {
     }
   });
 
-  await prisma.profile.upsert({
-    where: { id: PROFILE_ID },
-    update: profileData,
-    create: profileData
-  });
-
   await prisma.homestaySection.upsert({
     where: { id: HOMESTAY_SECTION_ID },
     update: homestaySectionData,
@@ -314,6 +310,12 @@ async function main() {
       create: contact
     });
   }
+
+  await prisma.profile.upsert({
+    where: { id: PROFILE_ID },
+    update: profileData,
+    create: profileData
+  });
 
   await prisma.serviceItem.deleteMany({
     where: {

@@ -726,15 +726,6 @@ export function HomePage() {
               <p className="max-w-2xl text-base leading-8 text-on-surface/65 sm:text-lg">
                 "{data.closing.message}"
               </p>
-
-              <Button
-                href={data.closing.ctaLink}
-                variant="primary"
-                className="mt-2 px-10 py-4 text-base shadow-2xl"
-                {...getLinkProps(data.closing.ctaLink)}
-              >
-                {data.closing.ctaLabel}
-              </Button>
             </div>
           </Card>
         </RevealSection>

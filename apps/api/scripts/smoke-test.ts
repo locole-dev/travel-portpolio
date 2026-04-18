@@ -30,6 +30,8 @@ type ProfileResponse = {
   heroPrimaryCtaLink: string;
   heroSecondaryCtaLabel: string;
   heroSecondaryCtaLink: string;
+  heroPrimaryContactId: string | null;
+  heroSecondaryContactId: string | null;
 };
 
 type ContactResponse = {
@@ -232,7 +234,9 @@ async function testProfileRoute() {
       heroPrimaryCtaLabel: profile.heroPrimaryCtaLabel,
       heroPrimaryCtaLink: profile.heroPrimaryCtaLink,
       heroSecondaryCtaLabel: profile.heroSecondaryCtaLabel,
-      heroSecondaryCtaLink: profile.heroSecondaryCtaLink
+      heroSecondaryCtaLink: profile.heroSecondaryCtaLink,
+      heroPrimaryContactId: profile.heroPrimaryContactId,
+      heroSecondaryContactId: profile.heroSecondaryContactId
     })
   });
 }

@@ -14,6 +14,9 @@ export type Profile = {
   heroPrimaryCtaLink: string;
   heroSecondaryCtaLabel: string;
   heroSecondaryCtaLink: string;
+  /** When set, public site-content resolves primary hero label/link from this contact if active. */
+  heroPrimaryContactId?: string | null;
+  heroSecondaryContactId?: string | null;
   updatedAt?: string;
 };
 

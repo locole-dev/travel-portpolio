@@ -33,9 +33,14 @@ function normalizeUrl(a: string) {
 
 function encodeCtaChoice(
   link: string,
+  linkedContactId: string | null | undefined,
   contacts: ContactMethod[],
   presets: typeof HERO_PAGE_PRESETS
 ): string {
+  if (linkedContactId) {
+    const byId = contacts.find((c) => c.id === linkedContactId);
+    if (byId?.isActive) return `c:${byId.id}`;
+  }
   const n = normalizeUrl(link);
   const contact = contacts.find((c) => normalizeUrl(c.link) === n);
   if (contact) return `c:${contact.id}`;
@@ -53,7 +58,9 @@ const emptyForm: Profile = {
   heroPrimaryCtaLabel: "",
   heroPrimaryCtaLink: "",
   heroSecondaryCtaLabel: "",
-  heroSecondaryCtaLink: ""
+  heroSecondaryCtaLink: "",
+  heroPrimaryContactId: null,
+  heroSecondaryContactId: null
 };
 
 export function ProfilePage() {
@@ -98,21 +105,31 @@ export function ProfilePage() {
     [data?.contacts]
   );
 
-  const primaryChoice = encodeCtaChoice(form.heroPrimaryCtaLink, activeContacts, HERO_PAGE_PRESETS);
+  const primaryChoice = encodeCtaChoice(
+    form.heroPrimaryCtaLink,
+    form.heroPrimaryContactId,
+    activeContacts,
+    HERO_PAGE_PRESETS
+  );
   const secondaryChoice = encodeCtaChoice(
     form.heroSecondaryCtaLink,
+    form.heroSecondaryContactId,
     activeContacts,
     HERO_PAGE_PRESETS
   );
 
   function applyPrimaryChoice(encoded: string) {
-    if (encoded === "custom") return;
+    if (encoded === "custom") {
+      setForm((f) => ({ ...f, heroPrimaryContactId: null }));
+      return;
+    }
     if (encoded.startsWith("c:")) {
       const id = encoded.slice(2);
       const c = activeContacts.find((x) => x.id === id);
       if (c) {
         setForm((f) => ({
           ...f,
+          heroPrimaryContactId: c.id,
           heroPrimaryCtaLabel: contactCtaLabel(c),
           heroPrimaryCtaLink: c.link
         }));
@@ -125,6 +142,7 @@ export function ProfilePage() {
       if (p) {
         setForm((f) => ({
           ...f,
+          heroPrimaryContactId: null,
           heroPrimaryCtaLabel: p.label,
           heroPrimaryCtaLink: p.link
         }));
@@ -133,13 +151,17 @@ export function ProfilePage() {
   }
 
   function applySecondaryChoice(encoded: string) {
-    if (encoded === "custom") return;
+    if (encoded === "custom") {
+      setForm((f) => ({ ...f, heroSecondaryContactId: null }));
+      return;
+    }
     if (encoded.startsWith("c:")) {
       const id = encoded.slice(2);
       const c = activeContacts.find((x) => x.id === id);
       if (c) {
         setForm((f) => ({
           ...f,
+          heroSecondaryContactId: c.id,
           heroSecondaryCtaLabel: contactCtaLabel(c),
           heroSecondaryCtaLink: c.link
         }));
@@ -152,6 +174,7 @@ export function ProfilePage() {
       if (p) {
         setForm((f) => ({
           ...f,
+          heroSecondaryContactId: null,
           heroSecondaryCtaLabel: p.label,
           heroSecondaryCtaLink: p.link
         }));
@@ -176,7 +199,9 @@ export function ProfilePage() {
           heroPrimaryCtaLabel: form.heroPrimaryCtaLabel,
           heroPrimaryCtaLink: form.heroPrimaryCtaLink,
           heroSecondaryCtaLabel: form.heroSecondaryCtaLabel,
-          heroSecondaryCtaLink: form.heroSecondaryCtaLink
+          heroSecondaryCtaLink: form.heroSecondaryCtaLink,
+          heroPrimaryContactId: form.heroPrimaryContactId ?? null,
+          heroSecondaryContactId: form.heroSecondaryContactId ?? null
         })
       });
 
@@ -407,6 +432,7 @@ export function ProfilePage() {
                         onChange={(e) =>
                           setForm((current) => ({
                             ...current,
+                            heroPrimaryContactId: null,
                             heroPrimaryCtaLabel: e.target.value
                           }))
                         }
@@ -418,6 +444,7 @@ export function ProfilePage() {
                         onChange={(e) =>
                           setForm((current) => ({
                             ...current,
+                            heroPrimaryContactId: null,
                             heroPrimaryCtaLink: e.target.value
                           }))
                         }
@@ -449,6 +476,7 @@ export function ProfilePage() {
                         onChange={(e) =>
                           setForm((current) => ({
                             ...current,
+                            heroSecondaryContactId: null,
                             heroSecondaryCtaLabel: e.target.value
                           }))
                         }
@@ -460,6 +488,7 @@ export function ProfilePage() {
                         onChange={(e) =>
                           setForm((current) => ({
                             ...current,
+                            heroSecondaryContactId: null,
                             heroSecondaryCtaLink: e.target.value
                           }))
                         }

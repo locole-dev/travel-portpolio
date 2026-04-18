@@ -1,16 +1,27 @@
 import { ApiError } from "./api-error";
 import { handleMockApiRequest } from "./mock-api";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ??
-  "http://localhost:4000/api/v1";
+const DEFAULT_API_BASE = "http://localhost:4000/api/v1";
 
-/** Same-origin relative base (e.g. `/api/v1`) cannot be passed to `new URL()` alone. */
-const API_ORIGIN = /^https?:\/\//i.test(API_BASE_URL)
-  ? new URL(API_BASE_URL).origin
-  : typeof window !== "undefined"
-    ? window.location.origin
-    : "http://localhost:5173";
+const rawApiBase = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "").trim() ?? "";
+/** Empty env becomes default; relative paths like `/api/v1` are valid for `fetch`. */
+const API_BASE_URL = rawApiBase || DEFAULT_API_BASE;
+
+function resolveApiOrigin(base: string): string {
+  if (/^https?:\/\//i.test(base)) {
+    try {
+      return new URL(base).origin;
+    } catch {
+      /* malformed absolute URL — fall back to current page origin */
+    }
+  }
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+  return "http://localhost:5173";
+}
+
+const API_ORIGIN = resolveApiOrigin(API_BASE_URL);
 const MOCK_API_ENABLED = import.meta.env.VITE_ENABLE_MOCK_API === "true";
 
 type ApiEnvelope<TData> = {

@@ -242,15 +242,15 @@ export function HomePage() {
           left: "50%",
           translateX: "-50%",
         }}
-        className="fixed z-50 max-w-full overflow-hidden transition-all duration-300"
+        className="fixed z-50 max-w-full overflow-x-hidden transition-all duration-300"
       >
         <div className="container-shell flex min-w-0 max-w-full flex-col px-6 py-4 md:px-8">
-          <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-3">
+          <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-3">
             {/* Logo */}
             <motion.div
               initial={{ opacity: 0, x: -16 }}
               animate={{ opacity: 1, x: 0 }}
-              className="min-w-0 truncate font-display text-xl font-black tracking-tight text-primary md:text-2xl"
+              className="min-w-0 break-words font-display text-xl font-black leading-snug tracking-tight text-primary md:text-2xl"
             >
               {data.profile.fullName}
             </motion.div>
@@ -295,12 +295,12 @@ export function HomePage() {
             <motion.div
               initial={{ opacity: 0, x: 16 }}
               animate={{ opacity: 1, x: 0 }}
-              className="shrink-0"
+              className="shrink-0 self-start md:self-center"
             >
               <Button
                 href={data.profile.heroPrimaryCtaLink}
                 variant="primary"
-                className="!px-5 !py-2 text-sm shadow-xl"
+                className="!px-4 !py-2 text-center text-xs leading-tight shadow-xl !whitespace-normal sm:!px-5 sm:text-sm"
                 {...getLinkProps(data.profile.heroPrimaryCtaLink)}
               >
                 {data.profile.heroPrimaryCtaLabel.trim() || t("hero.ctaFallbackPrimary")}
@@ -310,7 +310,7 @@ export function HomePage() {
 
           {/* Navigation — mobile (in-page anchors only; homestay details via “View full stay”) */}
           <nav
-            className="-mx-2 mt-3 flex min-w-0 w-full max-w-full gap-1 overflow-x-auto overscroll-x-contain pb-1 pt-1 [-webkit-overflow-scrolling:touch] md:hidden"
+            className="-mx-2 mt-3 flex min-w-0 w-full max-w-full flex-wrap gap-1.5 pb-1 pt-1 md:hidden"
             aria-label="Section navigation"
           >
             {navItems.map((item) => (
@@ -318,7 +318,7 @@ export function HomePage() {
                 key={`mobile-${item.id}`}
                 href={item.href}
                 onClick={handleNavClick(item)}
-                className={`shrink-0 rounded-full px-3 py-2 text-xs font-semibold transition-colors ${
+                className={`rounded-full px-3 py-2 text-xs font-semibold transition-colors ${
                   activeNavId === item.id
                     ? "bg-primary/12 text-primary"
                     : "bg-on-surface/[0.04] text-on-surface/70 hover:bg-primary/8 hover:text-primary"
@@ -424,7 +424,7 @@ export function HomePage() {
               initial={{ opacity: 0, scale: 0.92, rotate: -2 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-              className="relative order-1 mx-auto w-full max-w-[240px] overflow-x-hidden sm:max-w-[300px] lg:order-2 lg:max-w-[460px]"
+              className="relative order-1 mx-auto w-full max-w-[240px] overflow-hidden sm:max-w-[300px] lg:order-2 lg:max-w-[460px]"
             >
               {/* Decorative blobs */}
               <div className="absolute -left-6 top-4 h-32 w-32 rounded-full bg-[#fda874]/40 blur-2xl lg:-left-12 lg:top-8 lg:h-48 lg:w-48 lg:blur-3xl" />
@@ -434,7 +434,7 @@ export function HomePage() {
                 <img
                   src={heroAvatar}
                   alt={data.profile.fullName}
-                  className="aspect-square w-full object-cover lg:aspect-[3/4]"
+                  className="block aspect-square w-full object-cover lg:aspect-[3/4]"
                 />
               </div>
             </motion.div>

@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { AdminLayout } from "./components/admin/AdminLayout";
+import { PublicLayout } from "./layouts/PublicLayout";
 import { HomePage } from "./pages/HomePage";
 import { HomestayDetailPage } from "./pages/HomestayDetailPage";
 import { ClosingPage } from "./pages/admin/ClosingPage";
@@ -14,12 +15,17 @@ import { SettingsPage } from "./pages/admin/SettingsPage";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
-    element: <HomePage />
-  },
-  {
-    path: "/homestay",
-    element: <HomestayDetailPage />
+    element: <PublicLayout />,
+    children: [
+      {
+        path: "/",
+        element: <HomePage />
+      },
+      {
+        path: "/homestay",
+        element: <HomestayDetailPage />
+      }
+    ]
   },
   {
     path: "/admin/login",

@@ -1,3 +1,5 @@
+import type { PublicLocale } from "./public-locale";
+
 const EMAIL_PLATFORMS = new Set(["mail", "email", "gmail"]);
 
 function humanizePlatform(platform: string): string {
@@ -17,8 +19,13 @@ function humanizePlatform(platform: string): string {
 }
 
 /** Hero CTA label for a contact (kept in sync with API `contact-cta-label.ts`). */
-export function contactCtaLabel(c: { platform: string }): string {
+export function contactCtaLabel(c: { platform: string }, locale: PublicLocale = "en"): string {
   const p = c.platform.toLowerCase();
-  if (EMAIL_PLATFORMS.has(p)) return "Send email";
+  if (EMAIL_PLATFORMS.has(p)) {
+    return locale === "vi" ? "Gửi email" : "Send email";
+  }
+  if (locale === "vi") {
+    return `Nhắn qua ${humanizePlatform(c.platform)}`;
+  }
   return `Chat on ${humanizePlatform(c.platform)}`;
 }

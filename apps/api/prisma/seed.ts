@@ -13,14 +13,19 @@ const CLOSING_SECTION_ID = "closing_singleton";
 const profileData = {
   id: PROFILE_ID,
   fullName: "Nguyen Thanh Hoang",
+  fullNameVi: "",
   title: "Nguyen Thanh Hoang",
+  titleVi: "",
   shortIntro:
     "I help travelers feel comfortable from the moment they arrive, with a warm homestay, local rides, and personal support for planning around the city.",
+  shortIntroVi: "",
   avatarImage:
     "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop",
   heroPrimaryCtaLabel: "Chat on WhatsApp",
+  heroPrimaryCtaLabelVi: "",
   heroPrimaryCtaLink: "https://wa.me/855000000000",
   heroSecondaryCtaLabel: "See the Homestay",
+  heroSecondaryCtaLabelVi: "",
   heroSecondaryCtaLink: "#homestay",
   heroPrimaryContactId: "contact-whatsapp",
   heroSecondaryContactId: null
@@ -44,17 +49,25 @@ We hope this little house feels like a pause worth taking: not flashy, but warm,
 const homestaySectionData = {
   id: HOMESTAY_SECTION_ID,
   title: "Stay at TwentyNine Homestay",
+  titleVi: "",
   previewDescription: homestayPreview,
+  previewDescriptionVi: "",
   description: homestayFullDescription,
-  isActive: true
+  descriptionVi: "",
+  isActive: true,
+  locationLabelVi: "",
+  seasonalRatesNoteVi: ""
 };
 
 const closingSectionData = {
   id: CLOSING_SECTION_ID,
   title: "Thank You for Visiting",
+  titleVi: "",
   message:
     "If you need a room, a ride, or a trusted local guide, send a message and I can help you plan a smooth stay.",
+  messageVi: "",
   ctaLabel: "Send a Message",
+  ctaLabelVi: "",
   ctaLink: "https://wa.me/855000000000"
 };
 
@@ -63,6 +76,7 @@ const contacts = [
     id: "contact-gmail",
     platform: "gmail",
     label: "Email",
+    labelVi: "",
     value: "hello@twentyninehomestay.com",
     link: "mailto:hello@twentyninehomestay.com",
     icon: "mail",
@@ -73,6 +87,7 @@ const contacts = [
     id: "contact-whatsapp",
     platform: "whatsapp",
     label: "WhatsApp",
+    labelVi: "",
     value: "+855 00 000 000",
     link: "https://wa.me/855000000000",
     icon: "message-circle-more",
@@ -83,6 +98,7 @@ const contacts = [
     id: "contact-zalo",
     platform: "zalo",
     label: "Zalo",
+    labelVi: "",
     value: "TwentyNine Homestay",
     link: "https://zalo.me",
     icon: "message-square",
@@ -93,6 +109,7 @@ const contacts = [
     id: "contact-kakaotalk",
     platform: "kakaotalk",
     label: "KakaoTalk",
+    labelVi: "",
     value: "twentynine.host",
     link: "https://www.kakaocorp.com/page/service/service/KakaoTalk",
     icon: "messages-square",
@@ -103,6 +120,7 @@ const contacts = [
     id: "contact-wechat",
     platform: "wechat",
     label: "WeChat",
+    labelVi: "",
     value: "twentynine.host",
     link: "https://www.wechat.com",
     icon: "messages-square",
@@ -113,6 +131,7 @@ const contacts = [
     id: "contact-line",
     platform: "line",
     label: "Line",
+    labelVi: "",
     value: "@twentynine",
     link: "https://line.me",
     icon: "message-circle",
@@ -123,6 +142,7 @@ const contacts = [
     id: "contact-instagram",
     platform: "instagram",
     label: "Instagram",
+    labelVi: "",
     value: "@twentyninehomestay",
     link: "https://instagram.com/twentyninehomestay",
     icon: "instagram",
@@ -135,10 +155,13 @@ const services = [
   {
     id: "service-local-guide",
     title: "Local Guide",
+    titleVi: "",
     description:
       "Private local guidance for easy planning, hidden spots, and practical travel support.",
+    descriptionVi: "",
     icon: "map",
     ctaLabel: "Ask About Tours",
+    ctaLabelVi: "",
     ctaLink: "https://wa.me/855000000000",
     isActive: true,
     sortOrder: 1
@@ -146,9 +169,12 @@ const services = [
   {
     id: "service-taxi",
     title: "Taxi",
+    titleVi: "",
     description: "Trusted rides for city transfers, day trips, and flexible schedules.",
+    descriptionVi: "",
     icon: "car-front",
     ctaLabel: "Book a Ride",
+    ctaLabelVi: "",
     ctaLink: "https://wa.me/855000000000",
     isActive: true,
     sortOrder: 2
@@ -156,9 +182,12 @@ const services = [
   {
     id: "service-airport-pickup",
     title: "Airport Pickup",
+    titleVi: "",
     description: "Straightforward airport pickup so guests arrive without confusion.",
+    descriptionVi: "",
     icon: "plane-landing",
     ctaLabel: "Arrange Pickup",
+    ctaLabelVi: "",
     ctaLink: "https://wa.me/855000000000",
     isActive: true,
     sortOrder: 3
@@ -166,9 +195,12 @@ const services = [
   {
     id: "service-tuk-tuk",
     title: "Tuk Tuk",
+    titleVi: "",
     description: "Simple short-distance transport with a local host experience.",
+    descriptionVi: "",
     icon: "bike",
     ctaLabel: "Check Availability",
+    ctaLabelVi: "",
     ctaLink: "https://wa.me/855000000000",
     isActive: true,
     sortOrder: 4
@@ -176,9 +208,12 @@ const services = [
   {
     id: "service-custom-support",
     title: "Custom Travel Support",
+    titleVi: "",
     description: "Flexible help for routes, recommendations, bookings, and local questions.",
+    descriptionVi: "",
     icon: "sparkles",
     ctaLabel: "Plan My Trip",
+    ctaLabelVi: "",
     ctaLink: "https://wa.me/855000000000",
     isActive: true,
     sortOrder: 5
@@ -347,6 +382,7 @@ async function main() {
       update: {
         imageUrl: image.imageUrl,
         altText: image.altText,
+        altTextVi: "",
         sortOrder: image.sortOrder,
         homestaySectionId: HOMESTAY_SECTION_ID
       },
@@ -354,6 +390,7 @@ async function main() {
         id: image.id,
         imageUrl: image.imageUrl,
         altText: image.altText,
+        altTextVi: "",
         sortOrder: image.sortOrder,
         homestaySectionId: HOMESTAY_SECTION_ID
       }

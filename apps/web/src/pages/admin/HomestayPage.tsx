@@ -76,13 +76,18 @@ export function HomestayPage() {
   const { data, loading, error, refresh } = useResource<HomestayPageData>(loadHomestay);
   const [sectionForm, setSectionForm] = useState({
     title: "",
+    titleVi: "",
     previewDescription: "",
+    previewDescriptionVi: "",
     description: "",
+    descriptionVi: "",
     isActive: true,
     latitude: null as number | null,
     longitude: null as number | null,
     locationLabel: null as string | null,
-    seasonalRatesNote: null as string | null
+    locationLabelVi: "",
+    seasonalRatesNote: null as string | null,
+    seasonalRatesNoteVi: ""
   });
   const [status, setStatus] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -90,6 +95,7 @@ export function HomestayPage() {
   const [replaceImageId, setReplaceImageId] = useState<string | null>(null);
   const [editingImage, setEditingImage] = useState<HomestayImage | null>(null);
   const [editAltDraft, setEditAltDraft] = useState("");
+  const [editAltViDraft, setEditAltViDraft] = useState("");
   const [galleryError, setGalleryError] = useState<string | null>(null);
   const [galleryBusy, setGalleryBusy] = useState(false);
   const addGalleryFileRef = useRef<HTMLInputElement>(null);
@@ -97,6 +103,7 @@ export function HomestayPage() {
   const [seasonalModalOpen, setSeasonalModalOpen] = useState(false);
   const [locationDraft, setLocationDraft] = useState({ coords: "" });
   const [seasonalDraft, setSeasonalDraft] = useState("");
+  const [seasonalDraftVi, setSeasonalDraftVi] = useState("");
   const [quickModalBusy, setQuickModalBusy] = useState(false);
   const [quickModalError, setQuickModalError] = useState<string | null>(null);
 
@@ -105,13 +112,18 @@ export function HomestayPage() {
       const h = data.homestay;
       setSectionForm({
         title: h.title,
+        titleVi: h.titleVi ?? "",
         previewDescription: h.previewDescription,
+        previewDescriptionVi: h.previewDescriptionVi ?? "",
         description: h.description,
+        descriptionVi: h.descriptionVi ?? "",
         isActive: h.isActive,
         latitude: h.latitude ?? null,
         longitude: h.longitude ?? null,
         locationLabel: h.locationLabel ?? null,
-        seasonalRatesNote: h.seasonalRatesNote ?? null
+        locationLabelVi: h.locationLabelVi ?? "",
+        seasonalRatesNote: h.seasonalRatesNote ?? null,
+        seasonalRatesNoteVi: h.seasonalRatesNoteVi ?? ""
       });
     }
   }, [data]);
@@ -119,6 +131,7 @@ export function HomestayPage() {
   useEffect(() => {
     if (editingImage) {
       setEditAltDraft(editingImage.altText);
+      setEditAltViDraft(editingImage.altTextVi ?? "");
     }
   }, [editingImage]);
 
@@ -166,6 +179,7 @@ export function HomestayPage() {
   function openSeasonalModal() {
     setQuickModalError(null);
     setSeasonalDraft(sectionForm.seasonalRatesNote ?? "");
+    setSeasonalDraftVi(sectionForm.seasonalRatesNoteVi ?? "");
     setSeasonalModalOpen(true);
   }
 
@@ -221,7 +235,8 @@ export function HomestayPage() {
     setQuickModalError(null);
     const next = {
       ...sectionForm,
-      seasonalRatesNote: seasonalDraft.trim() ? seasonalDraft.trim() : null
+      seasonalRatesNote: seasonalDraft.trim() ? seasonalDraft.trim() : null,
+      seasonalRatesNoteVi: seasonalDraftVi.trim() ? seasonalDraftVi.trim() : ""
     };
     setQuickModalBusy(true);
     try {
@@ -312,7 +327,8 @@ export function HomestayPage() {
       await apiRequest(`/admin/homestay-images/${editingImage.id}`, {
         method: "PATCH",
         body: JSON.stringify({
-          altText: editAltDraft.trim()
+          altText: editAltDraft.trim(),
+          altTextVi: editAltViDraft.trim()
         })
       });
       setEditingImage(null);
@@ -395,12 +411,19 @@ export function HomestayPage() {
                 className="aspect-video w-full object-cover"
               />
             </div>
-            <div className="mt-6">
-              <Field label="Alt text">
+            <div className="mt-6 space-y-4">
+              <Field label="Alt text (English)">
                 <input
                   className="h-12 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
                   value={editAltDraft}
                   onChange={(e) => setEditAltDraft(e.target.value)}
+                />
+              </Field>
+              <Field label="Alt text (Vietnamese, optional)">
+                <input
+                  className="h-12 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
+                  value={editAltViDraft}
+                  onChange={(e) => setEditAltViDraft(e.target.value)}
                 />
               </Field>
             </div>
@@ -539,13 +562,21 @@ export function HomestayPage() {
             {quickModalError ? (
               <p className="mt-3 text-sm font-bold text-red-600">{quickModalError}</p>
             ) : null}
-            <div className="mt-6">
-              <Field label="Pricing notes">
+            <div className="mt-6 space-y-4">
+              <Field label="Pricing notes (English)">
                 <textarea
                   className="min-h-40 w-full rounded-xl border border-outline-variant/30 bg-white p-4 text-sm font-medium leading-relaxed outline-none focus:ring-4 focus:ring-primary/5"
                   placeholder="e.g. Low season (May–Sep): from $35/night. Peak (Dec–Jan): from $55/night, 2-night minimum."
                   value={seasonalDraft}
                   onChange={(e) => setSeasonalDraft(e.target.value)}
+                />
+              </Field>
+              <Field label="Pricing notes (Vietnamese, optional)">
+                <textarea
+                  className="min-h-32 w-full rounded-xl border border-outline-variant/30 bg-white p-4 text-sm font-medium leading-relaxed outline-none focus:ring-4 focus:ring-primary/5"
+                  placeholder="Ghi chú giá theo mùa bằng tiếng Việt…"
+                  value={seasonalDraftVi}
+                  onChange={(e) => setSeasonalDraftVi(e.target.value)}
                 />
               </Field>
             </div>
@@ -667,6 +698,66 @@ export function HomestayPage() {
                   <p className="mt-1 text-xs text-on-surface/40">
                     {sectionForm.description.length}/10000
                   </p>
+                </Field>
+
+                <div className="rounded-2xl border border-dashed border-outline-variant/35 bg-surface-container/20 p-6">
+                  <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-on-surface/40">
+                    Vietnamese (optional)
+                  </p>
+                  <Field label="Section title (VI)">
+                    <input
+                      className="h-12 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
+                      value={sectionForm.titleVi}
+                      onChange={(e) => setSectionForm((p) => ({ ...p, titleVi: e.target.value }))}
+                    />
+                  </Field>
+                  <div className="mt-4">
+                    <Field label="Preview description (VI)" help="Homepage teaser in Vietnamese.">
+                      <textarea
+                        className="min-h-24 w-full rounded-xl border border-outline-variant/30 bg-white p-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
+                        maxLength={500}
+                        value={sectionForm.previewDescriptionVi}
+                        onChange={(e) =>
+                          setSectionForm((p) => ({ ...p, previewDescriptionVi: e.target.value }))
+                        }
+                      />
+                    </Field>
+                  </div>
+                  <div className="mt-4">
+                    <Field label="Full description (VI)" help="Long story for /homestay in Vietnamese.">
+                      <textarea
+                        className="min-h-48 w-full rounded-xl border border-outline-variant/30 bg-white p-4 text-sm font-medium leading-relaxed outline-none focus:ring-4 focus:ring-primary/5"
+                        maxLength={10000}
+                        value={sectionForm.descriptionVi}
+                        onChange={(e) =>
+                          setSectionForm((p) => ({ ...p, descriptionVi: e.target.value }))
+                        }
+                      />
+                    </Field>
+                  </div>
+                </div>
+
+                <Field
+                  label="Map caption (English, optional)"
+                  help="Short line above the embedded map on the stay page."
+                >
+                  <input
+                    className="h-12 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
+                    value={sectionForm.locationLabel ?? ""}
+                    onChange={(e) => {
+                      const v = e.target.value.trim();
+                      setSectionForm((p) => ({ ...p, locationLabel: v ? v : null }));
+                    }}
+                  />
+                </Field>
+                <Field label="Map caption (Vietnamese, optional)">
+                  <input
+                    className="h-12 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
+                    value={sectionForm.locationLabelVi}
+                    onChange={(e) =>
+                      setSectionForm((p) => ({ ...p, locationLabelVi: e.target.value }))
+                    }
+                  />
                 </Field>
               </div>
            </Card>

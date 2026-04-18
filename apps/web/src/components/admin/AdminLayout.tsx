@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
-import { Button } from "../ui/Button";
 import { LoadingBlock } from "../ui/LoadingBlock";
 
 const navItems = [

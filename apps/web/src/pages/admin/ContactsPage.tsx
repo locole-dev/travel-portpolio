@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { 
-  Pencil, 
-  Plus, 
-  Trash2, 
-  MessageSquare, 
-  Save, 
-  ChevronRight,
+import {
+  Pencil,
+  Plus,
+  Trash2,
+  MessageSquare,
+  Save,
   Globe,
   Mail,
   Phone,
@@ -14,7 +13,7 @@ import {
 import { motion } from "framer-motion";
 
 import { apiRequest } from "../../lib/api";
-import { contactPlatformOptions, iconOptions } from "../../lib/options";
+import { contactPlatformOptions } from "../../lib/options";
 import type { ContactMethod } from "../../types/content";
 import { useResource } from "../../hooks/useResource";
 import { Button } from "../../components/ui/Button";
@@ -26,6 +25,7 @@ import { StatusBanner } from "../../components/ui/StatusBanner";
 const createEmptyContact = (): Omit<ContactMethod, "id"> => ({
   platform: "gmail",
   label: "",
+  labelVi: "",
   value: "",
   link: "",
   icon: "mail",
@@ -48,7 +48,6 @@ export function ContactsPage() {
   const { data, loading, error, refresh } = useResource(loadContacts);
   const [form, setForm] = useState(createEmptyContact());
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -74,7 +73,6 @@ export function ContactsPage() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitting(true);
-    setStatus(null);
 
     try {
       await apiRequest(editingId ? `/admin/contacts/${editingId}` : "/admin/contacts", {
@@ -85,7 +83,6 @@ export function ContactsPage() {
         })
       });
 
-      setStatus(editingId ? "Contact updated successfully!" : "New contact channel created!");
       setEditingId(null);
       setForm(createEmptyContact());
       await refresh({ silent: true });
@@ -103,7 +100,6 @@ export function ContactsPage() {
 
     try {
       await apiRequest(`/admin/contacts/${id}`, { method: "DELETE" });
-      setStatus("Contact deleted.");
       if (editingId === id) {
         setEditingId(null);
       }
@@ -234,6 +230,15 @@ export function ContactsPage() {
                       placeholder="e.g. WhatsApp"
                       onChange={(e) => setForm(p => ({ ...p, label: e.target.value }))}
                       required
+                    />
+                 </Field>
+
+                 <Field label="Display Label (Vietnamese, optional)">
+                    <input
+                      className="h-12 w-full rounded-xl border border-outline-variant/30 bg-surface-container/20 px-4 text-sm font-bold outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                      value={form.labelVi ?? ""}
+                      placeholder="e.g. Zalo"
+                      onChange={(e) => setForm(p => ({ ...p, labelVi: e.target.value }))}
                     />
                  </Field>
 

@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { 
-  Pencil, 
-  Save, 
-  Trash2, 
-  UploadCloud, 
-  Image as ImageIcon,
-  MoreVertical,
-  Download,
+import {
+  Pencil,
+  Trash2,
+  UploadCloud,
   CheckCircle2,
   XCircle
 } from "lucide-react";

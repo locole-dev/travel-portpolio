@@ -4,6 +4,7 @@ import { AppError } from "../../lib/errors.js";
 type ContactInput = {
   platform: string;
   label: string;
+  labelVi?: string;
   value?: string | null;
   link: string;
   icon: string;
@@ -40,7 +41,16 @@ export async function listPublicContactMethods() {
 
 export async function createContactMethod(input: ContactInput) {
   return prisma.contactMethod.create({
-    data: input
+    data: {
+      platform: input.platform,
+      label: input.label,
+      labelVi: input.labelVi ?? "",
+      value: input.value ?? null,
+      link: input.link,
+      icon: input.icon,
+      isActive: input.isActive,
+      sortOrder: input.sortOrder
+    }
   });
 }
 

@@ -15,12 +15,17 @@ enum AdminRole {
 model Profile {
   id                       String          @id
   fullName                 String
+  fullNameVi               String          @default("")
   title                    String
+  titleVi                  String          @default("")
   shortIntro               String
+  shortIntroVi             String          @default("")
   avatarImage              String?
   heroPrimaryCtaLabel      String
+  heroPrimaryCtaLabelVi    String          @default("")
   heroPrimaryCtaLink       String
   heroSecondaryCtaLabel    String
+  heroSecondaryCtaLabelVi  String          @default("")
   heroSecondaryCtaLink     String
   heroPrimaryContactId     String?
   heroSecondaryContactId   String?
@@ -34,6 +39,7 @@ model ContactMethod {
   id                     String    @id @default(cuid())
   platform               String
   label                  String
+  labelVi                String    @default("")
   value                  String?
   link                   String
   icon                   String
@@ -50,14 +56,19 @@ model ContactMethod {
 model HomestaySection {
   id                 String          @id
   title              String
+  titleVi            String          @default("")
   previewDescription String @default("")
+  previewDescriptionVi String        @default("")
   description        String
+  descriptionVi      String          @default("")
   isActive           Boolean         @default(true)
   /// WGS84 — set together with longitude for map embed
   latitude           Float?
   longitude          Float?
   locationLabel      String?
+  locationLabelVi    String          @default("")
   seasonalRatesNote  String?
+  seasonalRatesNoteVi String         @default("")
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
   images      HomestayImage[]
@@ -68,6 +79,7 @@ model HomestayImage {
   homestaySectionId String
   imageUrl          String
   altText           String
+  altTextVi         String          @default("")
   sortOrder         Int             @default(0)
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
@@ -80,9 +92,12 @@ model HomestayImage {
 model ServiceItem {
   id          String   @id @default(cuid())
   title       String
+  titleVi     String   @default("")
   description String
+  descriptionVi String @default("")
   icon        String
   ctaLabel    String?
+  ctaLabelVi  String   @default("")
   ctaLink     String?
   isActive    Boolean  @default(true)
   sortOrder   Int      @default(0)
@@ -95,8 +110,11 @@ model ServiceItem {
 model ClosingSection {
   id        String   @id
   title     String
+  titleVi   String   @default("")
   message   String
+  messageVi String   @default("")
   ctaLabel  String
+  ctaLabelVi String @default("")
   ctaLink   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -13,8 +13,11 @@ import { StatusBanner } from "../../components/ui/StatusBanner";
 const emptyClosing: ClosingSection = {
   id: "",
   title: "",
+  titleVi: "",
   message: "",
+  messageVi: "",
   ctaLabel: "",
+  ctaLabelVi: "",
   ctaLink: ""
 };
 
@@ -41,8 +44,11 @@ export function ClosingPage() {
         method: "PUT",
         body: JSON.stringify({
           title: form.title,
+          titleVi: form.titleVi ?? "",
           message: form.message,
+          messageVi: form.messageVi ?? "",
           ctaLabel: form.ctaLabel,
+          ctaLabelVi: form.ctaLabelVi ?? "",
           ctaLink: form.ctaLink
         })
       });
@@ -122,6 +128,17 @@ export function ClosingPage() {
                   />
                </Field>
 
+               <Field label="Final Headline (Vietnamese, optional)">
+                  <input
+                    className="h-14 w-full rounded-2xl border border-outline-variant/30 bg-surface-container/20 px-6 text-lg font-bold outline-none transition-all focus:bg-white focus:ring-4 focus:ring-primary/5"
+                    value={form.titleVi ?? ""}
+                    placeholder="Tiêu đề tiếng Việt"
+                    onChange={(event) =>
+                      setForm((current) => ({ ...current, titleVi: event.target.value }))
+                    }
+                  />
+               </Field>
+
                <Field label="Personal Message">
                   <textarea
                     className="min-h-48 w-full rounded-2xl border border-outline-variant/30 bg-surface-container/20 p-6 text-base font-medium leading-relaxed outline-none transition-all focus:bg-white focus:ring-4 focus:ring-primary/5"
@@ -129,6 +146,17 @@ export function ClosingPage() {
                     placeholder="Write a warm invitation..."
                     onChange={(event) =>
                       setForm((current) => ({ ...current, message: event.target.value }))
+                    }
+                  />
+               </Field>
+
+               <Field label="Personal Message (Vietnamese, optional)">
+                  <textarea
+                    className="min-h-36 w-full rounded-2xl border border-outline-variant/30 bg-surface-container/20 p-6 text-base font-medium leading-relaxed outline-none transition-all focus:bg-white focus:ring-4 focus:ring-primary/5"
+                    value={form.messageVi ?? ""}
+                    placeholder="Lời mời bằng tiếng Việt…"
+                    onChange={(event) =>
+                      setForm((current) => ({ ...current, messageVi: event.target.value }))
                     }
                   />
                </Field>
@@ -154,6 +182,18 @@ export function ClosingPage() {
                       }
                     />
                   </Field>
+                  <div className="md:col-span-2">
+                    <Field label="Button Label (Vietnamese, optional)">
+                      <input
+                        className="h-14 w-full rounded-2xl border border-outline-variant/30 bg-surface-container/20 px-6 text-sm font-bold outline-none focus:bg-white focus:ring-4 focus:ring-primary/5"
+                        value={form.ctaLabelVi ?? ""}
+                        placeholder="Nhãn nút"
+                        onChange={(event) =>
+                          setForm((current) => ({ ...current, ctaLabelVi: event.target.value }))
+                        }
+                      />
+                    </Field>
+                  </div>
                </div>
             </form>
          </Card>

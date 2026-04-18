@@ -20,12 +20,12 @@ type ProfilePageData = {
 };
 
 /** In-page / app routes for hero buttons (same as public site anchors). */
-const HERO_PAGE_PRESETS: ReadonlyArray<{ id: string; label: string; link: string }> = [
-  { id: "homestay-anchor", label: "See the Homestay", link: "#homestay" },
-  { id: "homestay-page", label: "Stay details", link: "/homestay" },
-  { id: "contact-anchor", label: "Contact", link: "#contact" },
-  { id: "home-anchor", label: "Home", link: "#home" }
-];
+const HERO_PAGE_PRESETS = [
+  { id: "homestay-anchor", label: "See the Homestay", labelVi: "Xem homestay", link: "#homestay" },
+  { id: "homestay-page", label: "Stay details", labelVi: "Chi tiết lưu trú", link: "/homestay" },
+  { id: "contact-anchor", label: "Contact", labelVi: "Liên hệ", link: "#contact" },
+  { id: "home-anchor", label: "Home", labelVi: "Trang chủ", link: "#home" }
+] as const;
 
 function normalizeUrl(a: string) {
   return a.trim();
@@ -35,7 +35,7 @@ function encodeCtaChoice(
   link: string,
   linkedContactId: string | null | undefined,
   contacts: ContactMethod[],
-  presets: typeof HERO_PAGE_PRESETS
+  presets: readonly { id: string; label: string; link: string }[]
 ): string {
   if (linkedContactId) {
     const byId = contacts.find((c) => c.id === linkedContactId);
@@ -52,12 +52,17 @@ function encodeCtaChoice(
 const emptyForm: Profile = {
   id: "",
   fullName: "",
+  fullNameVi: "",
   title: "",
+  titleVi: "",
   shortIntro: "",
+  shortIntroVi: "",
   avatarImage: "",
   heroPrimaryCtaLabel: "",
+  heroPrimaryCtaLabelVi: "",
   heroPrimaryCtaLink: "",
   heroSecondaryCtaLabel: "",
+  heroSecondaryCtaLabelVi: "",
   heroSecondaryCtaLink: "",
   heroPrimaryContactId: null,
   heroSecondaryContactId: null
@@ -131,6 +136,7 @@ export function ProfilePage() {
           ...f,
           heroPrimaryContactId: c.id,
           heroPrimaryCtaLabel: contactCtaLabel(c),
+          heroPrimaryCtaLabelVi: contactCtaLabel(c, "vi"),
           heroPrimaryCtaLink: c.link
         }));
       }
@@ -144,6 +150,7 @@ export function ProfilePage() {
           ...f,
           heroPrimaryContactId: null,
           heroPrimaryCtaLabel: p.label,
+          heroPrimaryCtaLabelVi: p.labelVi ?? "",
           heroPrimaryCtaLink: p.link
         }));
       }
@@ -163,6 +170,7 @@ export function ProfilePage() {
           ...f,
           heroSecondaryContactId: c.id,
           heroSecondaryCtaLabel: contactCtaLabel(c),
+          heroSecondaryCtaLabelVi: contactCtaLabel(c, "vi"),
           heroSecondaryCtaLink: c.link
         }));
       }
@@ -176,6 +184,7 @@ export function ProfilePage() {
           ...f,
           heroSecondaryContactId: null,
           heroSecondaryCtaLabel: p.label,
+          heroSecondaryCtaLabelVi: p.labelVi ?? "",
           heroSecondaryCtaLink: p.link
         }));
       }
@@ -193,12 +202,17 @@ export function ProfilePage() {
         method: "PUT",
         body: JSON.stringify({
           fullName: form.fullName,
+          fullNameVi: form.fullNameVi ?? "",
           title: form.title,
+          titleVi: form.titleVi ?? "",
           shortIntro: form.shortIntro,
+          shortIntroVi: form.shortIntroVi ?? "",
           avatarImage: form.avatarImage?.trim() ? form.avatarImage.trim() : null,
           heroPrimaryCtaLabel: form.heroPrimaryCtaLabel,
+          heroPrimaryCtaLabelVi: form.heroPrimaryCtaLabelVi ?? "",
           heroPrimaryCtaLink: form.heroPrimaryCtaLink,
           heroSecondaryCtaLabel: form.heroSecondaryCtaLabel,
+          heroSecondaryCtaLabelVi: form.heroSecondaryCtaLabelVi ?? "",
           heroSecondaryCtaLink: form.heroSecondaryCtaLink,
           heroPrimaryContactId: form.heroPrimaryContactId ?? null,
           heroSecondaryContactId: form.heroSecondaryContactId ?? null
@@ -390,6 +404,43 @@ export function ProfilePage() {
                   }
                 />
               </Field>
+
+              <div className="rounded-2xl border border-dashed border-outline-variant/35 bg-surface-container/30 p-6">
+                <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-on-surface/40">
+                  Vietnamese (optional) — public site when guest chooses Tiếng Việt
+                </p>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <Field label="Full name (VI)">
+                    <input
+                      className="h-14 w-full rounded-xl border border-outline-variant/50 bg-white px-5 text-sm font-medium outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
+                      value={form.fullNameVi ?? ""}
+                      onChange={(event) =>
+                        setForm((current) => ({ ...current, fullNameVi: event.target.value }))
+                      }
+                    />
+                  </Field>
+                  <Field label="Professional title (VI)">
+                    <input
+                      className="h-14 w-full rounded-xl border border-outline-variant/50 bg-white px-5 text-sm font-medium outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
+                      value={form.titleVi ?? ""}
+                      onChange={(event) =>
+                        setForm((current) => ({ ...current, titleVi: event.target.value }))
+                      }
+                    />
+                  </Field>
+                </div>
+                <div className="mt-6">
+                  <Field label="Short bio (VI)">
+                    <textarea
+                      className="min-h-28 w-full rounded-xl border border-outline-variant/50 bg-white p-5 text-sm font-medium leading-relaxed outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
+                      value={form.shortIntroVi ?? ""}
+                      onChange={(event) =>
+                        setForm((current) => ({ ...current, shortIntroVi: event.target.value }))
+                      }
+                    />
+                  </Field>
+                </div>
+              </div>
             </div>
           </Card>
 
@@ -427,13 +478,25 @@ export function ProfilePage() {
                     <div className="mt-3 grid gap-3">
                       <input
                         className="h-12 w-full rounded-xl border border-outline-variant/50 bg-white px-4 text-sm font-medium outline-none focus:border-primary/50"
-                        placeholder="Button label"
+                        placeholder="Button label (English)"
                         value={form.heroPrimaryCtaLabel}
                         onChange={(e) =>
                           setForm((current) => ({
                             ...current,
                             heroPrimaryContactId: null,
                             heroPrimaryCtaLabel: e.target.value
+                          }))
+                        }
+                      />
+                      <input
+                        className="h-12 w-full rounded-xl border border-outline-variant/50 bg-white px-4 text-sm font-medium outline-none focus:border-primary/50"
+                        placeholder="Button label (Vietnamese, optional)"
+                        value={form.heroPrimaryCtaLabelVi ?? ""}
+                        onChange={(e) =>
+                          setForm((current) => ({
+                            ...current,
+                            heroPrimaryContactId: null,
+                            heroPrimaryCtaLabelVi: e.target.value
                           }))
                         }
                       />
@@ -455,6 +518,20 @@ export function ProfilePage() {
                       → {form.heroPrimaryCtaLink}
                     </p>
                   )}
+                  {primaryChoice !== "custom" ? (
+                    <div className="mt-3">
+                      <Field label="Primary button (Vietnamese, optional)">
+                        <input
+                          className="h-12 w-full rounded-xl border border-outline-variant/50 bg-white px-4 text-sm font-medium outline-none focus:border-primary/50"
+                          placeholder="Overrides auto label when locale is VI"
+                          value={form.heroPrimaryCtaLabelVi ?? ""}
+                          onChange={(e) =>
+                            setForm((current) => ({ ...current, heroPrimaryCtaLabelVi: e.target.value }))
+                          }
+                        />
+                      </Field>
+                    </div>
+                  ) : null}
                 </Field>
 
                 <Field
@@ -471,13 +548,25 @@ export function ProfilePage() {
                     <div className="mt-3 grid gap-3">
                       <input
                         className="h-12 w-full rounded-xl border border-outline-variant/50 bg-white px-4 text-sm font-medium outline-none focus:border-primary/50"
-                        placeholder="Button label"
+                        placeholder="Button label (English)"
                         value={form.heroSecondaryCtaLabel}
                         onChange={(e) =>
                           setForm((current) => ({
                             ...current,
                             heroSecondaryContactId: null,
                             heroSecondaryCtaLabel: e.target.value
+                          }))
+                        }
+                      />
+                      <input
+                        className="h-12 w-full rounded-xl border border-outline-variant/50 bg-white px-4 text-sm font-medium outline-none focus:border-primary/50"
+                        placeholder="Button label (Vietnamese, optional)"
+                        value={form.heroSecondaryCtaLabelVi ?? ""}
+                        onChange={(e) =>
+                          setForm((current) => ({
+                            ...current,
+                            heroSecondaryContactId: null,
+                            heroSecondaryCtaLabelVi: e.target.value
                           }))
                         }
                       />
@@ -499,6 +588,20 @@ export function ProfilePage() {
                       → {form.heroSecondaryCtaLink}
                     </p>
                   )}
+                  {secondaryChoice !== "custom" ? (
+                    <div className="mt-3">
+                      <Field label="Secondary button (Vietnamese, optional)">
+                        <input
+                          className="h-12 w-full rounded-xl border border-outline-variant/50 bg-white px-4 text-sm font-medium outline-none focus:border-primary/50"
+                          placeholder="Overrides auto label when locale is VI"
+                          value={form.heroSecondaryCtaLabelVi ?? ""}
+                          onChange={(e) =>
+                            setForm((current) => ({ ...current, heroSecondaryCtaLabelVi: e.target.value }))
+                          }
+                        />
+                      </Field>
+                    </div>
+                  ) : null}
                 </Field>
               </div>
             </div>

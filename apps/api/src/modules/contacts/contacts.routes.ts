@@ -15,6 +15,7 @@ import {
 const contactSchema = z.object({
   platform: z.enum(CONTACT_PLATFORMS),
   label: z.string().trim().min(2).max(60),
+  labelVi: z.string().trim().max(60).optional().default(""),
   value: z.string().trim().max(120).optional().nullable(),
   link: z.string().trim().min(1).max(300),
   icon: z.string().trim().min(1).max(60),

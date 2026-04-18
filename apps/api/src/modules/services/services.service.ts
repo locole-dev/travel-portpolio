@@ -3,9 +3,12 @@ import { AppError } from "../../lib/errors.js";
 
 type ServiceInput = {
   title: string;
+  titleVi?: string;
   description: string;
+  descriptionVi?: string;
   icon: string;
   ctaLabel?: string | null;
+  ctaLabelVi?: string;
   ctaLink?: string | null;
   isActive: boolean;
   sortOrder: number;
@@ -40,7 +43,18 @@ export async function listPublicServiceItems() {
 
 export async function createServiceItem(input: ServiceInput) {
   return prisma.serviceItem.create({
-    data: input
+    data: {
+      title: input.title,
+      titleVi: input.titleVi ?? "",
+      description: input.description,
+      descriptionVi: input.descriptionVi ?? "",
+      icon: input.icon,
+      ctaLabel: input.ctaLabel ?? null,
+      ctaLabelVi: input.ctaLabelVi ?? "",
+      ctaLink: input.ctaLink ?? null,
+      isActive: input.isActive,
+      sortOrder: input.sortOrder
+    }
   });
 }
 

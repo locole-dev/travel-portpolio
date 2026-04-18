@@ -13,9 +13,12 @@ import {
 
 const serviceSchema = z.object({
   title: z.string().trim().min(2).max(80),
+  titleVi: z.string().trim().max(80).optional().default(""),
   description: z.string().trim().min(10).max(280),
+  descriptionVi: z.string().trim().max(280).optional().default(""),
   icon: z.string().trim().min(1).max(60),
   ctaLabel: z.string().trim().max(60).optional().nullable(),
+  ctaLabelVi: z.string().trim().max(60).optional().default(""),
   ctaLink: z.string().trim().max(300).optional().nullable(),
   isActive: z.boolean().default(true),
   sortOrder: z.number().int().nonnegative().default(0)

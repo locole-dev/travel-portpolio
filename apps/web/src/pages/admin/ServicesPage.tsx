@@ -1,16 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { 
-  Pencil, 
-  Plus, 
-  Trash2, 
-  Sparkles, 
-  ChevronRight, 
-  Save, 
-  Eye, 
-  EyeOff,
-  Move
-} from "lucide-react";
-import { motion, Reorder } from "framer-motion";
+import { Pencil, Plus, Trash2, Sparkles, Save } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { apiRequest } from "../../lib/api";
 import { iconOptions } from "../../lib/options";
@@ -24,9 +14,12 @@ import { StatusBanner } from "../../components/ui/StatusBanner";
 
 const createEmptyService = (): Omit<ServiceItem, "id"> => ({
   title: "",
+  titleVi: "",
   description: "",
+  descriptionVi: "",
   icon: "map",
   ctaLabel: "",
+  ctaLabelVi: "",
   ctaLink: "",
   isActive: true,
   sortOrder: 0
@@ -37,7 +30,6 @@ export function ServicesPage() {
   const { data, loading, error, refresh } = useResource(loadServices);
   const [form, setForm] = useState(createEmptyService());
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -50,9 +42,12 @@ export function ServicesPage() {
     if (current) {
       setForm({
         title: current.title,
+        titleVi: current.titleVi ?? "",
         description: current.description,
+        descriptionVi: current.descriptionVi ?? "",
         icon: current.icon,
         ctaLabel: current.ctaLabel ?? "",
+        ctaLabelVi: current.ctaLabelVi ?? "",
         ctaLink: current.ctaLink ?? "",
         isActive: current.isActive,
         sortOrder: current.sortOrder
@@ -63,7 +58,6 @@ export function ServicesPage() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitting(true);
-    setStatus(null);
 
     try {
       await apiRequest(editingId ? `/admin/services/${editingId}` : "/admin/services", {
@@ -74,7 +68,6 @@ export function ServicesPage() {
           ctaLink: form.ctaLink || null
         })
       });
-      setStatus(editingId ? "Service updated successfully!" : "New service created!");
       setEditingId(null);
       setForm(createEmptyService());
       await refresh({ silent: true });
@@ -92,7 +85,6 @@ export function ServicesPage() {
 
     try {
       await apiRequest(`/admin/services/${id}`, { method: "DELETE" });
-      setStatus("Service deleted.");
       if (editingId === id) {
         setEditingId(null);
       }
@@ -201,6 +193,15 @@ export function ServicesPage() {
                     />
                  </Field>
 
+                 <Field label="Service Header (Vietnamese, optional)">
+                    <input
+                      className="h-12 w-full rounded-xl border border-outline-variant/30 bg-surface-container/20 px-4 text-sm font-bold outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                      value={form.titleVi ?? ""}
+                      placeholder="Tiêu đề tiếng Việt"
+                      onChange={(e) => setForm(p => ({ ...p, titleVi: e.target.value }))}
+                    />
+                 </Field>
+
                  <Field label="Brief Description">
                     <textarea
                       className="min-h-32 w-full rounded-xl border border-outline-variant/30 bg-surface-container/20 p-4 text-sm font-bold outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
@@ -208,6 +209,15 @@ export function ServicesPage() {
                       placeholder="Describe what guests can expect..."
                       onChange={(e) => setForm(p => ({ ...p, description: e.target.value }))}
                       required
+                    />
+                 </Field>
+
+                 <Field label="Brief Description (Vietnamese, optional)">
+                    <textarea
+                      className="min-h-24 w-full rounded-xl border border-outline-variant/30 bg-surface-container/20 p-4 text-sm font-bold outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"
+                      value={form.descriptionVi ?? ""}
+                      placeholder="Mô tả ngắn…"
+                      onChange={(e) => setForm(p => ({ ...p, descriptionVi: e.target.value }))}
                     />
                  </Field>
 
@@ -240,6 +250,12 @@ export function ServicesPage() {
                       placeholder="Button Label"
                       value={form.ctaLabel ?? ""}
                       onChange={(e) => setForm(p => ({ ...p, ctaLabel: e.target.value }))}
+                    />
+                    <input
+                      className="h-10 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-xs font-bold outline-none"
+                      placeholder="Button Label (VI, optional)"
+                      value={form.ctaLabelVi ?? ""}
+                      onChange={(e) => setForm(p => ({ ...p, ctaLabelVi: e.target.value }))}
                     />
                     <input
                       className="h-10 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-xs font-bold outline-none"

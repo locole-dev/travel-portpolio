@@ -5,7 +5,7 @@ import { contactCtaLabel } from "../../lib/contact-cta-label";
 import { getIcon } from "../../lib/icons";
 import type { ContactMethod } from "../../types/content";
 
-export type HeroCtaPreset = { id: string; label: string; link: string };
+export type HeroCtaPreset = { id: string; label: string; link: string; labelVi?: string };
 
 export { contactCtaLabel };
 

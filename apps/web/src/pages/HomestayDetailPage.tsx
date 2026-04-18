@@ -9,6 +9,7 @@ import type { SiteContent } from "../types/content";
 import { Button } from "../components/ui/Button";
 import { LoadingBlock } from "../components/ui/LoadingBlock";
 import { StatusBanner } from "../components/ui/StatusBanner";
+import { useI18n } from "../i18n/I18nContext";
 
 /** Matches `index.html` — never clear `document.title` to empty or the tab shows the URL (e.g. localhost). */
 const DEFAULT_DOCUMENT_TITLE = "Nguyen Thanh Hoang";
@@ -18,9 +19,10 @@ function sortHomestayImages(images: NonNullable<SiteContent["homestay"]>["images
 }
 
 export function HomestayDetailPage() {
+  const { t, locale } = useI18n();
   const loadContent = useCallback(
-    () => apiRequest<SiteContent>("/public/site-content"),
-    []
+    () => apiRequest<SiteContent>(`/public/site-content?locale=${locale}`),
+    [locale]
   );
   const { data, loading, error } = useResource(loadContent);
 
@@ -39,10 +41,11 @@ export function HomestayDetailPage() {
     }
 
     const stayTitle = data.homestay?.title?.trim();
+    const suffix = t("homestayPage.docTitleSuffix");
     if (stayTitle) {
-      document.title = `${stayTitle} · Stay`;
+      document.title = `${stayTitle} · ${suffix}`;
     } else if (data.profile.fullName) {
-      document.title = `${data.profile.fullName} · Stay`;
+      document.title = `${data.profile.fullName} · ${suffix}`;
     } else {
       document.title = DEFAULT_DOCUMENT_TITLE;
     }
@@ -50,19 +53,19 @@ export function HomestayDetailPage() {
     return () => {
       document.title = DEFAULT_DOCUMENT_TITLE;
     };
-  }, [data]);
+  }, [data, t]);
 
   if (loading) {
-    return <LoadingBlock label="Loading stay…" variant="home" />;
+    return <LoadingBlock label={t("loading.stay")} variant="home" />;
   }
 
   if (!data || error) {
     return (
       <div className="container-shell py-16">
-        <StatusBanner tone="error" message={error ?? "Content could not be loaded."} />
+        <StatusBanner tone="error" message={error ?? t("errors.contentLoad")} />
         <div className="mt-8 text-center">
           <Link to="/" className="text-sm font-bold text-primary hover:underline">
-            Back to home
+            {t("homestayPage.backHome")}
           </Link>
         </div>
       </div>
@@ -88,14 +91,14 @@ export function HomestayDetailPage() {
               className="inline-flex items-center gap-2 text-sm font-bold text-on-surface/60 hover:text-primary"
             >
               <ArrowLeft className="h-4 w-4" />
-              Home
+              {t("nav.home")}
             </Link>
           </div>
         </header>
         <div className="container-shell py-20 text-center">
-          <p className="text-lg text-on-surface/60">Stay details are not available yet.</p>
+          <p className="text-lg text-on-surface/60">{t("homestayPage.notAvailable")}</p>
           <Button href="/" variant="primary" className="mt-8 inline-block">
-            Return home
+            {t("homestayPage.returnHome")}
           </Button>
         </div>
       </div>
@@ -116,19 +119,19 @@ export function HomestayDetailPage() {
           </Link>
           <nav className="hidden items-center gap-1 text-sm font-medium text-on-surface/70 md:flex">
             <Link to="/" className="rounded-full px-3 py-2 hover:text-primary">
-              Home
+              {t("nav.home")}
             </Link>
             <a href="/#experiences" className="rounded-full px-3 py-2 hover:text-primary">
-              Experiences
+              {t("nav.experiences")}
             </a>
             <span className="rounded-full bg-primary/10 px-3 py-2 font-semibold text-primary">
-              Stays
+              {t("nav.stays")}
             </span>
             <a href="/#reviews" className="rounded-full px-3 py-2 hover:text-primary">
-              Reviews
+              {t("nav.reviews")}
             </a>
             <a href="/#contact" className="rounded-full px-3 py-2 hover:text-primary">
-              Contact
+              {t("nav.contact")}
             </a>
           </nav>
           <Link
@@ -136,7 +139,7 @@ export function HomestayDetailPage() {
             className="flex items-center gap-2 text-sm font-bold text-on-surface/55 hover:text-primary md:hidden"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back
+            {t("homestayPage.back")}
           </Link>
         </div>
       </header>
@@ -160,7 +163,7 @@ export function HomestayDetailPage() {
               animate={{ opacity: 1, y: 0 }}
               className="section-label !mb-2 text-white/90"
             >
-              ABOUT OUR STAY
+              {t("homestayPage.aboutStay")}
             </motion.p>
             <motion.h1
               initial={{ opacity: 0, y: 16 }}
@@ -186,18 +189,18 @@ export function HomestayDetailPage() {
       {homestay.latitude != null && homestay.longitude != null ? (
         <section className="container-shell relative border-t border-outline-variant/10 pb-12 pt-4 md:pb-16 md:pt-8">
           <h2 className="font-display text-2xl font-black tracking-tight text-on-surface md:text-3xl">
-            Location
+            {t("homestayPage.location")}
           </h2>
           {homestay.locationLabel?.trim() ? (
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-on-surface/60">
               {homestay.locationLabel}
             </p>
           ) : (
-            <p className="mt-2 text-sm text-on-surface/45">Where to find us on the map.</p>
+            <p className="mt-2 text-sm text-on-surface/45">{t("homestayPage.mapDefaultCaption")}</p>
           )}
           <div className="mt-8 overflow-hidden rounded-[2rem] border border-outline-variant/15 bg-surface-container shadow-lg shadow-on-surface/5">
             <iframe
-              title="Homestay location map"
+              title={t("homestayPage.mapIframeTitle")}
               className="aspect-video min-h-[260px] w-full md:min-h-[340px]"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -210,7 +213,7 @@ export function HomestayDetailPage() {
       {homestay.seasonalRatesNote?.trim() ? (
         <section className="container-shell relative border-t border-outline-variant/10 pb-12 pt-12 md:pb-16 md:pt-16">
           <h2 className="font-display text-2xl font-black tracking-tight text-on-surface md:text-3xl">
-            Rates &amp; seasons
+            {t("homestayPage.ratesTitle")}
           </h2>
           <div className="mx-auto mt-6 max-w-3xl">
             <p className="section-copy whitespace-pre-wrap text-lg leading-relaxed text-on-surface/75 md:text-xl">
@@ -224,11 +227,9 @@ export function HomestayDetailPage() {
       {galleryImages.length > 0 ? (
         <section className="container-shell relative border-t border-outline-variant/10 pb-24 pt-12 md:pb-32 md:pt-16">
           <h2 className="font-display text-2xl font-black tracking-tight text-on-surface md:text-3xl">
-            Gallery
+            {t("homestayPage.galleryTitle")}
           </h2>
-          <p className="mt-2 text-sm text-on-surface/50">
-            More views from the stay — same warm details throughout.
-          </p>
+          <p className="mt-2 text-sm text-on-surface/50">{t("homestayPage.gallerySubtitle")}</p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {galleryImages.map((img, index) => (
               <motion.div
@@ -256,7 +257,7 @@ export function HomestayDetailPage() {
         <div className="container-shell flex flex-col items-center justify-between gap-4 text-sm text-on-surface/50 md:flex-row">
           <p className="font-display font-bold text-primary">{profile.fullName}</p>
           <Link to="/" className="font-bold text-primary hover:underline">
-            ← Back to full site
+            {t("homestayPage.backToSite")}
           </Link>
         </div>
       </footer>

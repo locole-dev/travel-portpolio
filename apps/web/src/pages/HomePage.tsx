@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Lenis from "lenis";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -15,6 +15,7 @@ import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { LoadingBlock } from "../components/ui/LoadingBlock";
 import { StatusBanner } from "../components/ui/StatusBanner";
+import { useI18n } from "../i18n/I18nContext";
 
 /* ── Types ── */
 type NavItem = {
@@ -82,20 +83,25 @@ function RevealSection({
   );
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { id: "home", label: "Home", href: "#home" },
-  { id: "experiences", label: "Experiences", href: "#experiences" },
-  { id: "homestay", label: "Stays", href: "#homestay" },
-  { id: "reviews", label: "Reviews", href: "#reviews" },
-  { id: "contact", label: "Contact", href: "#contact" },
-];
-
 const SCROLL_LOCK_MS = 900;
 
 /* ══════════════════════════════════════════════ */
 /*  HomePage                                      */
 /* ══════════════════════════════════════════════ */
 export function HomePage() {
+  const { t, locale, setLocale } = useI18n();
+
+  const navItems = useMemo<NavItem[]>(
+    () => [
+      { id: "home", label: t("nav.home"), href: "#home" },
+      { id: "experiences", label: t("nav.experiences"), href: "#experiences" },
+      { id: "homestay", label: t("nav.stays"), href: "#homestay" },
+      { id: "reviews", label: t("nav.reviews"), href: "#reviews" },
+      { id: "contact", label: t("nav.contact"), href: "#contact" }
+    ],
+    [t]
+  );
+
   /* ── Lenis smooth scroll ── */
   useEffect(() => {
     const lenis = new Lenis({
@@ -119,14 +125,14 @@ export function HomePage() {
 
   /* ── Data ── */
   const loadSiteContent = useCallback(
-    () => apiRequest<SiteContent>("/public/site-content"),
-    []
+    () => apiRequest<SiteContent>(`/public/site-content?locale=${locale}`),
+    [locale]
   );
   const { data, loading, error } = useResource(loadSiteContent);
 
   /* ── UI state (declared before any conditional return) ── */
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const [activeItem, setActiveItem] = useState("Home");
+  const [activeNavId, setActiveNavId] = useState("home");
   const scrollLockUntilRef = useRef(0);
   const sectionRatioRef = useRef<Record<string, number>>({});
 
@@ -143,11 +149,7 @@ export function HomePage() {
   useEffect(() => {
     if (!("IntersectionObserver" in window) || !data) return;
 
-    const idToLabel = Object.fromEntries(NAV_ITEMS.map((item) => [item.id, item.label])) as Record<
-      string,
-      string
-    >;
-    const navIds = NAV_ITEMS.map((i) => i.id);
+    const navIds = navItems.map((i) => i.id);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -167,8 +169,8 @@ export function HomePage() {
           }
         }
 
-        if (bestId && bestRatio > 0.08 && idToLabel[bestId]) {
-          setActiveItem(idToLabel[bestId]);
+        if (bestId && bestRatio > 0.08) {
+          setActiveNavId(bestId);
         }
       },
       {
@@ -186,20 +188,17 @@ export function HomePage() {
       observer.disconnect();
       sectionRatioRef.current = {};
     };
-  }, [data]);
+  }, [data, navItems]);
 
   /* ── Loading / Error gates ── */
   if (loading) {
-    return <LoadingBlock label="Loading your travel portfolio..." variant="home" />;
+    return <LoadingBlock label={t("loading.portfolio")} variant="home" />;
   }
 
   if (!data) {
     return (
       <div className="container-shell py-12">
-        <StatusBanner
-          tone="error"
-          message={error ?? "The public site content could not be loaded."}
-        />
+        <StatusBanner tone="error" message={error ?? t("errors.siteContent")} />
       </div>
     );
   }
@@ -213,7 +212,7 @@ export function HomePage() {
   const handleNavClick = (item: NavItem) => (e: React.MouseEvent) => {
     e.preventDefault();
     scrollLockUntilRef.current = Date.now() + SCROLL_LOCK_MS;
-    setActiveItem(item.label);
+    setActiveNavId(item.id);
     if (item.href === "#home") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
@@ -222,12 +221,12 @@ export function HomePage() {
     history.replaceState(null, "", item.href);
   };
 
-  const activeNavIndex = Math.max(0, NAV_ITEMS.findIndex((i) => i.label === activeItem));
+  const activeNavIndex = Math.max(0, navItems.findIndex((i) => i.id === activeNavId));
   const pillIndex = hoveredIndex !== null ? hoveredIndex : activeNavIndex;
 
   /* ══════════════ JSX ══════════════ */
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-surface selection:bg-primary/20">
+    <div className="relative min-h-screen max-w-full overflow-x-hidden bg-surface selection:bg-primary/20">
       {/* ── Background gradient blobs ── */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[720px] bg-[radial-gradient(circle_at_20%_10%,rgba(253,186,116,0.30),transparent_40%),radial-gradient(circle_at_80%_20%,rgba(125,211,252,0.25),transparent_35%),radial-gradient(circle_at_50%_30%,rgba(244,114,182,0.12),transparent_50%)]" />
 
@@ -243,10 +242,10 @@ export function HomePage() {
           left: "50%",
           translateX: "-50%",
         }}
-        className="fixed z-50 overflow-hidden transition-all duration-300"
+        className="fixed z-50 max-w-full overflow-hidden transition-all duration-300"
       >
-        <div className="container-shell flex flex-col px-6 py-4 md:px-8">
-          <div className="flex items-center justify-between gap-3">
+        <div className="container-shell flex min-w-0 max-w-full flex-col px-6 py-4 md:px-8">
+          <div className="flex min-w-0 items-center justify-between gap-2 sm:gap-3">
             {/* Logo */}
             <motion.div
               initial={{ opacity: 0, x: -16 }}
@@ -261,7 +260,7 @@ export function HomePage() {
               className="hidden items-center gap-1 text-sm font-medium text-on-surface/75 md:flex"
               onMouseLeave={() => setHoveredIndex(null)}
             >
-              {NAV_ITEMS.map((item, index) => (
+              {navItems.map((item, index) => (
                 <motion.a
                   key={item.id}
                   href={item.href}
@@ -281,7 +280,7 @@ export function HomePage() {
                   )}
                   <span
                     className={`relative z-10 transition-colors ${
-                      activeItem === item.label
+                      activeNavId === item.id
                         ? "font-semibold text-primary"
                         : "hover:text-primary"
                     }`}
@@ -304,23 +303,23 @@ export function HomePage() {
                 className="!px-5 !py-2 text-sm shadow-xl"
                 {...getLinkProps(data.profile.heroPrimaryCtaLink)}
               >
-                {data.profile.heroPrimaryCtaLabel.trim() || "Get in touch"}
+                {data.profile.heroPrimaryCtaLabel.trim() || t("hero.ctaFallbackPrimary")}
               </Button>
             </motion.div>
           </div>
 
           {/* Navigation — mobile (in-page anchors only; homestay details via “View full stay”) */}
           <nav
-            className="-mx-2 mt-3 flex gap-1 overflow-x-auto pb-1 pt-1 md:hidden"
+            className="-mx-2 mt-3 flex min-w-0 w-full max-w-full gap-1 overflow-x-auto overscroll-x-contain pb-1 pt-1 [-webkit-overflow-scrolling:touch] md:hidden"
             aria-label="Section navigation"
           >
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <a
                 key={`mobile-${item.id}`}
                 href={item.href}
                 onClick={handleNavClick(item)}
                 className={`shrink-0 rounded-full px-3 py-2 text-xs font-semibold transition-colors ${
-                  activeItem === item.label
+                  activeNavId === item.id
                     ? "bg-primary/12 text-primary"
                     : "bg-on-surface/[0.04] text-on-surface/70 hover:bg-primary/8 hover:text-primary"
                 }`}
@@ -336,7 +335,7 @@ export function HomePage() {
       <main className="flex flex-col gap-28 pb-32 pt-32 md:gap-36 md:pt-36">
 
         {/* ── HERO SECTION ── */}
-        <section id="home" className="container-shell relative pt-10 lg:pt-16">
+        <section id="home" className="container-shell relative overflow-x-hidden pt-10 lg:pt-16">
           <div className="flex flex-col lg:grid items-center gap-10 lg:gap-12 lg:grid-cols-[1.1fr_minmax(0,0.9fr)]">
             {/* Left: Copy */}
             <motion.div
@@ -346,7 +345,7 @@ export function HomePage() {
               className="relative z-10 flex flex-col gap-6 lg:gap-7 items-center text-center lg:items-start lg:text-left order-2 lg:order-1"
             >
               <p className="section-label !mb-0 font-bold tracking-[0.2em] text-tertiary">
-                HELLO, I'M
+                {t("hero.helloIm")}
               </p>
 
               <h1 className="font-display text-5xl font-black leading-[1.02] tracking-tight text-on-surface sm:text-6xl lg:text-[4.2rem]">
@@ -364,7 +363,7 @@ export function HomePage() {
                   className="px-8 py-3.5 text-base shadow-2xl"
                   {...getLinkProps(data.profile.heroPrimaryCtaLink)}
                 >
-                  {data.profile.heroPrimaryCtaLabel.trim() || "View Services"}
+                  {data.profile.heroPrimaryCtaLabel.trim() || t("hero.ctaFallbackPrimary")}
                 </Button>
                 <Button
                   href={data.profile.heroSecondaryCtaLink}
@@ -372,7 +371,7 @@ export function HomePage() {
                   className="px-8 py-3.5 text-base"
                   {...getLinkProps(data.profile.heroSecondaryCtaLink)}
                 >
-                  {data.profile.heroSecondaryCtaLabel.trim() || "Contact Me"}
+                  {data.profile.heroSecondaryCtaLabel.trim() || t("hero.ctaFallbackSecondary")}
                 </Button>
               </div>
 
@@ -382,7 +381,7 @@ export function HomePage() {
                 className="w-full scroll-mt-36 md:scroll-mt-32 mt-10 pt-10 border-t border-outline-variant/15 flex flex-col items-center lg:items-start"
               >
                 <h2 className="font-display text-3xl font-black tracking-tight text-on-surface mb-8">
-                  Let's Connect Anywhere
+                  {t("hero.connectTitle")}
                 </h2>
                 <div className="flex flex-wrap justify-center lg:justify-start gap-6 sm:gap-8">
                   {data.contacts.map((contact, index) => {
@@ -425,7 +424,7 @@ export function HomePage() {
               initial={{ opacity: 0, scale: 0.92, rotate: -2 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-              className="relative mx-auto w-full max-w-[240px] sm:max-w-[300px] lg:max-w-[460px] order-1 lg:order-2"
+              className="relative order-1 mx-auto w-full max-w-[240px] overflow-x-hidden sm:max-w-[300px] lg:order-2 lg:max-w-[460px]"
             >
               {/* Decorative blobs */}
               <div className="absolute -left-6 top-4 h-32 w-32 rounded-full bg-[#fda874]/40 blur-2xl lg:-left-12 lg:top-8 lg:h-48 lg:w-48 lg:blur-3xl" />
@@ -446,11 +445,10 @@ export function HomePage() {
         <RevealSection id="experiences" className="container-shell scroll-mt-28 md:scroll-mt-32">
           <div className="mb-14 text-center">
             <h2 className="font-display text-4xl font-black tracking-tight text-on-surface md:text-5xl">
-              Curated Experiences
+              {t("experiences.title")}
             </h2>
             <p className="section-copy mx-auto mt-4 max-w-2xl text-on-surface/60">
-              From hidden street food gems to seamless airport transfers, I handle the details so
-              you can enjoy the journey.
+              {t("experiences.subtitle")}
             </p>
           </div>
 
@@ -522,7 +520,7 @@ export function HomePage() {
             <div className="grid items-center gap-14 lg:grid-cols-[0.95fr_minmax(0,1.05fr)]">
               {/* Left: Info */}
               <div className="flex flex-col gap-6">
-                <p className="section-label">ABOUT OUR STAY</p>
+                <p className="section-label">{t("homestay.aboutLabel")}</p>
                 <h2 className="font-display text-4xl font-black leading-none tracking-tight text-on-surface md:text-5xl">
                   {data.homestay.title}
                 </h2>
@@ -534,15 +532,15 @@ export function HomePage() {
                   to="/homestay"
                   className="button-primary mt-2 inline-flex w-fit items-center gap-2 px-6 py-3 text-sm shadow-lg"
                 >
-                  View full stay
+                  {t("homestay.viewFullStay")}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
 
                 <div className="mt-2 grid gap-4">
                   {[
-                    "Organic Breakfast Included",
-                    "24/7 Personal Assistance",
-                    "Curated Local City Guides",
+                    t("homestay.perkBreakfast"),
+                    t("homestay.perkAssistance"),
+                    t("homestay.perkGuides")
                   ].map((item) => (
                     <div
                       key={item}
@@ -558,7 +556,7 @@ export function HomePage() {
               </div>
 
               {/* Right: Proportional Editorial Gallery */}
-              <div className="flex flex-col md:flex-row items-stretch gap-6 h-auto md:h-[620px]">
+              <div className="flex h-auto min-w-0 max-w-full flex-col items-stretch gap-6 md:h-[620px] md:flex-row">
                 {/* ── Focal Architectural Feature (58% width) ── */}
                 {highlightImages[0] && (
                   <motion.div 
@@ -578,7 +576,7 @@ export function HomePage() {
                 )}
 
                 {/* ── Stacked Detail Column (42% width) ── */}
-                <div className="w-full md:w-[42%] flex flex-col gap-6">
+                <div className="flex min-w-0 w-full max-w-full flex-col gap-6 md:w-[42%]">
                   {/* Top: Elegant Suite Detail */}
                   {highlightImages[1] && (
                     <motion.div 
@@ -597,7 +595,7 @@ export function HomePage() {
                   )}
 
                   {/* Bottom Row: Accent Pill & Details */}
-                  <div className="flex gap-6 h-[220px]">
+                  <div className="flex h-[220px] min-w-0 max-w-full gap-4 sm:gap-6">
                     {/* The Signature Pill */}
                     <motion.div 
                       initial={{ opacity: 0, y: 20 }}
@@ -606,8 +604,14 @@ export function HomePage() {
                       viewport={{ once: true }}
                       className="w-[125px] flex-shrink-0 bg-primary rounded-full p-6 text-white flex flex-col items-center justify-end text-center shadow-xl shadow-primary/20 pb-10"
                     >
-                      <span className="text-[10px] font-bold uppercase tracking-[0.25em] opacity-50 mb-3">STAY</span>
-                      <p className="font-display text-2xl font-black leading-[0.9] tracking-tighter">Sunlit<br/>Suite</p>
+                      <span className="text-[10px] font-bold uppercase tracking-[0.25em] opacity-50 mb-3">
+                        {t("homestay.pillStay")}
+                      </span>
+                      <p className="font-display text-2xl font-black leading-[0.9] tracking-tighter">
+                        {t("homestay.pillSuiteLine1")}
+                        <br />
+                        {t("homestay.pillSuiteLine2")}
+                      </p>
                     </motion.div>
 
                     {/* Architectural Detail */}
@@ -617,7 +621,7 @@ export function HomePage() {
                         whileInView={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
                         viewport={{ once: true }}
-                        className="flex-1 rounded-[3.5rem] overflow-hidden shadow-xl shadow-on-surface/5 group relative"
+                        className="min-w-0 flex-1 rounded-[3.5rem] overflow-hidden shadow-xl shadow-on-surface/5 group relative"
                       >
                         <img
                           src={resolveMediaUrl(highlightImages[2].imageUrl)}
@@ -633,40 +637,36 @@ export function HomePage() {
           </RevealSection>
         ) : (
           <RevealSection id="homestay" className="container-shell scroll-mt-28 py-16 text-center">
-            <p className="section-label">ABOUT OUR STAY</p>
-            <p className="mx-auto max-w-md text-on-surface/55">
-              Stay details will appear here when your homestay is published in the admin panel.
-            </p>
+            <p className="section-label">{t("homestay.aboutLabel")}</p>
+            <p className="mx-auto max-w-md text-on-surface/55">{t("homestay.emptyTitle")}</p>
           </RevealSection>
         )}
 
         {/* ── REVIEWS (Placeholder) ── */}
         <RevealSection id="reviews" className="container-shell scroll-mt-28 text-center md:scroll-mt-32">
-          <p className="section-label">Testimonials</p>
+          <p className="section-label">{t("reviews.label")}</p>
           <h2 className="font-display text-4xl font-black tracking-tight text-on-surface md:text-5xl">
-            What Guests Say
+            {t("reviews.title")}
           </h2>
-          <p className="section-copy mx-auto mt-4 max-w-xl text-on-surface/60">
-            Real stories from travelers who've experienced our warmth and hospitality firsthand.
-          </p>
+          <p className="section-copy mx-auto mt-4 max-w-xl text-on-surface/60">{t("reviews.subtitle")}</p>
 
           <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3">
             {[
               {
                 name: "Sarah M.",
-                text: "Hoang was an incredible host. The homestay was spotless and the local food tour changed my entire trip!",
+                text: t("reviews.card1Quote"),
                 stars: 5,
                 avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop",
               },
               {
                 name: "James T.",
-                text: "Best airport pickup experience ever. Seamless, friendly, and felt like being welcomed by a friend.",
+                text: t("reviews.card2Quote"),
                 stars: 5,
                 avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop",
               },
               {
                 name: "Yuki K.",
-                text: "The tuk tuk tour was a highlight of my Vietnam trip. Hoang knows every hidden corner of the city.",
+                text: t("reviews.card3Quote"),
                 stars: 5,
                 avatar: "https://images.unsplash.com/photo-1517841905240-472988bad157?q=80&w=150&auto=format&fit=crop",
               },
@@ -743,21 +743,49 @@ export function HomePage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-5">
-            {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((link) => (
+          <div className="flex flex-wrap items-center gap-5">
+            {(["privacy", "terms", "cookies"] as const).map((key) => (
               <a
-                key={link}
+                key={key}
                 href="#"
                 className="text-sm font-medium text-on-surface/50 transition hover:text-primary"
               >
-                {link}
+                {t(`footerPage.${key}`)}
               </a>
             ))}
           </div>
         </div>
 
-        <div className="container-shell mt-6 border-t border-outline-variant/8 pt-6 text-center text-xs text-on-surface/38">
-          © {new Date().getFullYear()} {data.profile.fullName}. All rights reserved.
+        <div className="container-shell mt-6 flex flex-col items-center gap-4 border-t border-outline-variant/8 pt-6 text-xs text-on-surface/38 sm:flex-row sm:justify-between">
+          <p className="text-center sm:text-left">
+            © {new Date().getFullYear()} {data.profile.fullName}. {t("footerPage.rights")}
+          </p>
+          <div className="flex items-center gap-2 font-medium">
+            <span className="text-on-surface/45">{t("footer.language")}</span>
+            <button
+              type="button"
+              onClick={() => setLocale("en")}
+              className={
+                locale === "en"
+                  ? "rounded-lg bg-primary/12 px-2.5 py-1 text-primary"
+                  : "rounded-lg px-2.5 py-1 text-on-surface/50 transition hover:text-primary"
+              }
+            >
+              {t("footer.enShort")}
+            </button>
+            <span className="text-on-surface/25">|</span>
+            <button
+              type="button"
+              onClick={() => setLocale("vi")}
+              className={
+                locale === "vi"
+                  ? "rounded-lg bg-primary/12 px-2.5 py-1 text-primary"
+                  : "rounded-lg px-2.5 py-1 text-on-surface/50 transition hover:text-primary"
+              }
+            >
+              {t("footer.viShort")}
+            </button>
+          </div>
         </div>
       </footer>
     </div>

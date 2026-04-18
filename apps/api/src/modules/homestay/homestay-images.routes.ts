@@ -13,6 +13,7 @@ import {
 const imageSchema = z.object({
   imageUrl: z.string().trim().min(1).max(2048),
   altText: z.string().trim().min(2).max(180),
+  altTextVi: z.string().trim().max(180).optional().default(""),
   sortOrder: z.number().int().nonnegative().default(0)
 });
 

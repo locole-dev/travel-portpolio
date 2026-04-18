@@ -145,6 +145,10 @@ We keep a shelf of maps and handwritten notes for places we actually go: the phá
 
 We hope this little house feels like a pause worth taking: not flashy, but warm, clear, and real.`,
       isActive: true,
+      latitude: null,
+      longitude: null,
+      locationLabel: null,
+      seasonalRatesNote: null,
       images: [
         {
           id: "gallery-1",

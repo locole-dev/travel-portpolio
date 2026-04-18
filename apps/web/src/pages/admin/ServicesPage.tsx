@@ -238,13 +238,13 @@ export function ServicesPage() {
                     <input
                       className="h-10 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-xs font-bold outline-none"
                       placeholder="Button Label"
-                      value={form.ctaLabel}
+                      value={form.ctaLabel ?? ""}
                       onChange={(e) => setForm(p => ({ ...p, ctaLabel: e.target.value }))}
                     />
                     <input
                       className="h-10 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-xs font-bold outline-none"
                       placeholder="Link (URL or Path)"
-                      value={form.ctaLink}
+                      value={form.ctaLink ?? ""}
                       onChange={(e) => setForm(p => ({ ...p, ctaLink: e.target.value }))}
                     />
                  </div>

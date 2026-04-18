@@ -442,7 +442,7 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* ── CURATED EXPERIENCES (Bento Grid) ── */}
+        {/* ── CURATED EXPERIENCES (horizontal cards, no CTA) ── */}
         <RevealSection id="experiences" className="container-shell scroll-mt-28 md:scroll-mt-32">
           <div className="mb-14 text-center">
             <h2 className="font-display text-4xl font-black tracking-tight text-on-surface md:text-5xl">
@@ -454,83 +454,61 @@ export function HomePage() {
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="flex flex-wrap justify-center gap-4 lg:gap-5">
             {data.services.map((service, index) => {
               const ServiceIcon = getIcon(service.icon);
 
-              let wrapperClasses = "";
               let cardClasses = "";
               let iconWrapperClasses = "";
-              let showIcon = true;
-              let contentWrapperClasses = "";
-              let buttonVariant: "primary" | "secondary" | "danger" = "primary";
+              let descriptionTone = "text-on-surface/65";
 
               if (index === 0) {
-                wrapperClasses = "md:col-span-2";
-                cardClasses = "bg-[#dbeafe] border border-blue-100 shadow-sm shadow-blue-900/5"; // Soft luxury blue
+                cardClasses =
+                  "bg-[#dbeafe] border border-blue-100 shadow-sm shadow-blue-900/5";
                 iconWrapperClasses = "bg-primary text-white shadow-primary/20";
-                buttonVariant = "primary";
               } else if (index === 1) {
-                wrapperClasses = "md:col-span-1";
-                cardClasses = "bg-[#fefce8] border border-yellow-100 shadow-sm shadow-yellow-900/5"; // Warm sun
+                cardClasses =
+                  "bg-[#fefce8] border border-yellow-100 shadow-sm shadow-yellow-900/5";
                 iconWrapperClasses = "bg-secondary text-on-secondary shadow-secondary/20";
               } else if (index === 2) {
-                wrapperClasses = "md:col-span-1";
-                cardClasses = "bg-[#f0fdf4] border border-green-100 shadow-sm shadow-green-900/5"; // Fresh leaf
+                cardClasses =
+                  "bg-[#f0fdf4] border border-green-100 shadow-sm shadow-green-900/5";
                 iconWrapperClasses = "bg-tertiary text-on-tertiary shadow-tertiary/20";
-              } else if (index >= 3) {
-                wrapperClasses = "md:col-span-2";
-                cardClasses = "bg-[#fdf2f8] border border-pink-100 shadow-sm shadow-pink-900/5 flex-row items-center justify-between"; // Soft blush
-                showIcon = false;
-                contentWrapperClasses = "max-w-md";
-                buttonVariant = "primary";
+              } else {
+                cardClasses =
+                  "bg-[#fdf2f8] border border-pink-100 shadow-sm shadow-pink-900/5";
+                iconWrapperClasses =
+                  "bg-primary/90 text-white shadow-primary/20";
+                descriptionTone = "text-on-surface/50";
               }
 
               return (
                 <motion.div
                   key={service.id}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                  transition={{ delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={{ y: -2, transition: { duration: 0.2 } }}
+                  transition={{ delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
                   viewport={{ once: true }}
-                  className={`${wrapperClasses} cursor-pointer`}
+                  className="w-full min-w-0 flex-[1_1_100%] sm:flex-[1_1_calc(50%-0.5rem)] lg:flex-[1_1_calc(33.333%-0.833rem)] lg:max-w-[26rem]"
                 >
                   <Card
-                    className={`flex h-full gap-6 rounded-[2.4rem] p-8 ${cardClasses} ${index < 3 ? 'flex-col' : 'flex-col sm:flex-row items-start sm:items-center'}`}
+                    className={`flex h-full flex-row items-start gap-4 rounded-[2rem] p-6 sm:gap-5 sm:p-7 ${cardClasses}`}
                   >
-                    {showIcon && (
-                      <div
-                        className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.4rem] shadow-lg ${iconWrapperClasses}`}
-                      >
-                        <ServiceIcon className="h-7 w-7" />
-                      </div>
-                    )}
+                    <div
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow-lg sm:h-14 sm:w-14 ${iconWrapperClasses}`}
+                    >
+                      <ServiceIcon className="h-6 w-6 sm:h-7 sm:w-7" />
+                    </div>
 
-                    <div className={contentWrapperClasses}>
-                      <p className="text-xl font-black tracking-tight text-on-surface">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-lg font-black tracking-tight text-on-surface sm:text-xl">
                         {service.title}
                       </p>
-                      <p className={`mt-3 text-sm leading-7 ${index === 3 ? 'text-on-surface/50' : 'text-on-surface/65'}`}>
+                      <p className={`mt-2 text-sm leading-relaxed ${descriptionTone}`}>
                         {service.description}
                       </p>
                     </div>
-
-                    {service.ctaLabel && service.ctaLink ? (
-                      <Button
-                        href={service.ctaLink}
-                        variant={buttonVariant}
-                        className={`mt-auto w-fit px-6 py-3 ${index === 0 ? '!bg-[#332f2c] !text-white hover:!scale-105 hover:!bg-black' : ''} ${index >= 3 ? 'sm:mt-0 sm:ml-auto' : ''}`}
-                        {...getLinkProps(service.ctaLink)}
-                      >
-                        {service.ctaLabel}
-                      </Button>
-                    ) : (
-                      <div className={`mt-auto inline-flex items-center gap-2 text-sm font-semibold ${index === 1 ? 'text-secondary' : 'text-tertiary'}`}>
-                        Details
-                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </div>
-                    )}
                   </Card>
                 </motion.div>
               );

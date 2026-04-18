@@ -1,11 +1,14 @@
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 
-export function Card({
-  children,
-  className = ""
-}: {
+type CardProps = {
   children: ReactNode;
   className?: string;
-}) {
-  return <div className={`glass-card ${className}`.trim()}>{children}</div>;
+} & HTMLAttributes<HTMLDivElement>;
+
+export function Card({ children, className = "", ...rest }: CardProps) {
+  return (
+    <div className={`glass-card ${className}`.trim()} {...rest}>
+      {children}
+    </div>
+  );
 }

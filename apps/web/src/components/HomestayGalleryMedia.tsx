@@ -14,7 +14,7 @@ export function HomestayGalleryMedia({ imageUrl, alt, mediaKind = "IMAGE", class
     return (
       <video
         src={src}
-        className={`relative z-[1] touch-manipulation ${className}`}
+        className={`touch-manipulation ${className}`}
         controls
         playsInline
         preload="metadata"

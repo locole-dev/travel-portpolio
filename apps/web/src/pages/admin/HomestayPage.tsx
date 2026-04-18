@@ -865,11 +865,11 @@ export function HomestayPage() {
                         className="h-full w-full object-cover transition-transform group-hover:scale-110"
                       />
                        {image.mediaKind === "VIDEO" ? (
-                         <span className="absolute left-3 top-3 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                         <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                            Video
                          </span>
                        ) : null}
-                       <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                       <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100">
                           <button
                             type="button"
                             className="h-10 w-10 rounded-full bg-white text-on-surface flex items-center justify-center shadow-lg hover:scale-110"

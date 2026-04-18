@@ -1,39 +1,16 @@
+# API + web only. Use an existing PostgreSQL — set DATABASE_URL in `.env`.
 services:
-  postgres:
-    image: postgres:15-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-twentynine_homestay}
-    ports:
-      - "${POSTGRES_PORT:-5433}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-twentynine_homestay}"
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
   api:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
       NODE_ENV: production
       API_PORT: 4000
       APP_ORIGIN: ${APP_ORIGIN:-http://localhost:8080}
       APP_ORIGINS: ${APP_ORIGINS:-http://localhost:8080}
-      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/twentynine_homestay}
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env to your PostgreSQL connection string}
       JWT_SECRET: ${JWT_SECRET:-change-this-before-production}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-12h}
       COOKIE_NAME: ${COOKIE_NAME:-twentynine_admin_token}
@@ -75,6 +52,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-
-volumes:
-  postgres_data:

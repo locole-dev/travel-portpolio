@@ -78,6 +78,9 @@ export const en = {
     ratesTitle: "Rates & seasons",
     galleryTitle: "Gallery",
     gallerySubtitle: "More views from the stay — same warm details throughout.",
+    videosTitle: "Film",
+    videosSubtitle: "Press play for a closer look at the space.",
+    videoBadge: "Video",
     backToSite: "← Back to full site"
   }
 };

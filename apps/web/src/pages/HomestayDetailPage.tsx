@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { apiRequest } from "../lib/api";
 import { useResource } from "../hooks/useResource";
-import type { SiteContent } from "../types/content";
+import type { HomestayImage, SiteContent } from "../types/content";
 import { HomestayGalleryMedia } from "../components/HomestayGalleryMedia";
 import { Button } from "../components/ui/Button";
 import { LoadingBlock } from "../components/ui/LoadingBlock";
@@ -17,6 +17,10 @@ const DEFAULT_DOCUMENT_TITLE = "Nguyen Thanh Hoang";
 
 function sortHomestayImages(images: NonNullable<SiteContent["homestay"]>["images"]) {
   return [...images].sort((a, b) => a.sortOrder - b.sortOrder || a.id.localeCompare(b.id));
+}
+
+function isVideoItem(item: HomestayImage): boolean {
+  return item.mediaKind === "VIDEO";
 }
 
 export function HomestayDetailPage() {
@@ -76,8 +80,10 @@ export function HomestayDetailPage() {
   const profile = data.profile;
   const homestay = data.homestay;
   const sortedImages = homestay ? sortHomestayImages(homestay.images) : [];
-  const heroImage = sortedImages[0];
-  const galleryImages = sortedImages.slice(1);
+  const imageItems = sortedImages.filter((i) => !isVideoItem(i));
+  const videoItems = sortedImages.filter((i) => isVideoItem(i));
+  const heroImage = imageItems[0];
+  const galleryImages = imageItems.slice(1);
 
   if (!homestay) {
     return (
@@ -152,7 +158,7 @@ export function HomestayDetailPage() {
             <HomestayGalleryMedia
               imageUrl={heroImage.imageUrl}
               alt={heroImage.altText}
-              mediaKind={heroImage.mediaKind}
+              mediaKind="IMAGE"
               className="h-full w-full object-cover"
             />
           ) : (
@@ -187,6 +193,40 @@ export function HomestayDetailPage() {
           </p>
         </div>
       </article>
+
+      {/* Videos — full-width editorial blocks (not grid thumbnails) */}
+      {videoItems.length > 0 ? (
+        <section className="container-shell relative border-t border-outline-variant/10 pb-12 pt-12 md:pb-16 md:pt-16">
+          <h2 className="font-display text-2xl font-black tracking-tight text-on-surface md:text-3xl">
+            {t("homestayPage.videosTitle")}
+          </h2>
+          <p className="mt-2 text-sm text-on-surface/50">{t("homestayPage.videosSubtitle")}</p>
+          <div className="mt-10 flex flex-col gap-8 md:gap-10">
+            {videoItems.map((clip, index) => (
+              <motion.div
+                key={clip.id}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ delay: index * 0.08, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+                className="relative overflow-hidden rounded-[2.5rem] bg-surface-container shadow-2xl shadow-on-surface/5 md:rounded-[3.5rem]"
+              >
+                <div className="aspect-video min-h-[200px] w-full md:min-h-[280px]">
+                  <HomestayGalleryMedia
+                    imageUrl={clip.imageUrl}
+                    alt={clip.altText}
+                    mediaKind="VIDEO"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <span className="pointer-events-none absolute left-4 top-4 rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white md:left-6 md:top-6">
+                  {t("homestayPage.videoBadge")}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {homestay.latitude != null && homestay.longitude != null ? (
         <section className="container-shell relative border-t border-outline-variant/10 pb-12 pt-4 md:pb-16 md:pt-8">
@@ -246,7 +286,7 @@ export function HomestayDetailPage() {
                   <HomestayGalleryMedia
                     imageUrl={img.imageUrl}
                     alt={img.altText}
-                    mediaKind={img.mediaKind}
+                    mediaKind="IMAGE"
                     className="h-full w-full object-cover transition duration-700 hover:scale-105"
                   />
                 </div>

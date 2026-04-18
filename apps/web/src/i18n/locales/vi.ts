@@ -80,6 +80,9 @@ export const vi: Messages = {
     ratesTitle: "Giá & mùa cao điểm",
     galleryTitle: "Thư viện ảnh",
     gallerySubtitle: "Thêm góc nhìn về nơi lưu trú — vẫn là những chi tiết ấm áp.",
+    videosTitle: "Video",
+    videosSubtitle: "Bấm phát để xem không gian rõ hơn.",
+    videoBadge: "Video",
     backToSite: "← Về trang đầy đủ"
   }
 };

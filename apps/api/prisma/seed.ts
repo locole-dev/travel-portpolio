@@ -5,6 +5,13 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+function omitKeys<T extends Record<string, unknown>, K extends keyof T>(obj: T, keys: readonly K[]): Omit<T, K> {
+  const out = { ...obj };
+  for (const k of keys) delete out[k];
+  return out as Omit<T, K>;
+}
+
+/** Re-seed updates English (and structure) but must not wipe *Vi filled by admin or backfill. */
 const PROFILE_ID = "profile_singleton";
 const HOMESTAY_SECTION_ID = "homestay_singleton";
 const CLOSING_SECTION_ID = "closing_singleton";
@@ -320,13 +327,20 @@ async function main() {
 
   await prisma.homestaySection.upsert({
     where: { id: HOMESTAY_SECTION_ID },
-    update: homestaySectionData,
+    update: omitKeys(homestaySectionData, [
+      "id",
+      "titleVi",
+      "previewDescriptionVi",
+      "descriptionVi",
+      "locationLabelVi",
+      "seasonalRatesNoteVi"
+    ]),
     create: homestaySectionData
   });
 
   await prisma.closingSection.upsert({
     where: { id: CLOSING_SECTION_ID },
-    update: closingSectionData,
+    update: omitKeys(closingSectionData, ["id", "titleVi", "messageVi", "ctaLabelVi"]),
     create: closingSectionData
   });
 
@@ -341,14 +355,21 @@ async function main() {
   for (const contact of contacts) {
     await prisma.contactMethod.upsert({
       where: { id: contact.id },
-      update: contact,
+      update: omitKeys(contact, ["id", "labelVi"]),
       create: contact
     });
   }
 
   await prisma.profile.upsert({
     where: { id: PROFILE_ID },
-    update: profileData,
+    update: omitKeys(profileData, [
+      "id",
+      "fullNameVi",
+      "titleVi",
+      "shortIntroVi",
+      "heroPrimaryCtaLabelVi",
+      "heroSecondaryCtaLabelVi"
+    ]),
     create: profileData
   });
 
@@ -363,7 +384,7 @@ async function main() {
   for (const service of services) {
     await prisma.serviceItem.upsert({
       where: { id: service.id },
-      update: service,
+      update: omitKeys(service, ["id", "titleVi", "descriptionVi", "ctaLabelVi"]),
       create: service
     });
   }
@@ -382,13 +403,13 @@ async function main() {
       update: {
         imageUrl: image.imageUrl,
         altText: image.altText,
-        altTextVi: "",
         sortOrder: image.sortOrder,
         homestaySectionId: HOMESTAY_SECTION_ID
       },
       create: {
         id: image.id,
         imageUrl: image.imageUrl,
+        mediaKind: "IMAGE",
         altText: image.altText,
         altTextVi: "",
         sortOrder: image.sortOrder,

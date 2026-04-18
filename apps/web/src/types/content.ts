@@ -39,10 +39,13 @@ export type ContactMethod = {
   updatedAt?: string;
 };
 
+export type HomestayMediaKind = "IMAGE" | "VIDEO";
+
 export type HomestayImage = {
   id: string;
   homestaySectionId: string;
   imageUrl: string;
+  mediaKind?: HomestayMediaKind;
   altText: string;
   altTextVi?: string;
   sortOrder: number;

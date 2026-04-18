@@ -74,6 +74,7 @@ export function localizeHomestay(section: HomestayWithImages | null, locale: Pub
         id: img.id,
         homestaySectionId: img.homestaySectionId,
         imageUrl: img.imageUrl,
+        mediaKind: img.mediaKind,
         altText: pickLocalized(img.altText, img.altTextVi, locale),
         sortOrder: img.sortOrder,
         createdAt: img.createdAt.toISOString(),

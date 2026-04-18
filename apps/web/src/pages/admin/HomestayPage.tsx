@@ -8,6 +8,7 @@ import {
   MapPin,
   DollarSign,
   UploadCloud,
+  Video,
   Eye,
   X
 } from "lucide-react";
@@ -17,6 +18,7 @@ import { Link } from "react-router-dom";
 import { apiRequest, resolveMediaUrl } from "../../lib/api";
 import type { HomestayImage, HomestaySection, MediaAsset } from "../../types/content";
 import { useResource } from "../../hooks/useResource";
+import { HomestayGalleryMedia } from "../../components/HomestayGalleryMedia";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
 import { Button } from "../../components/ui/Button";
 import { Card } from "../../components/ui/Card";
@@ -99,6 +101,7 @@ export function HomestayPage() {
   const [galleryError, setGalleryError] = useState<string | null>(null);
   const [galleryBusy, setGalleryBusy] = useState(false);
   const addGalleryFileRef = useRef<HTMLInputElement>(null);
+  const addGalleryVideoRef = useRef<HTMLInputElement>(null);
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [seasonalModalOpen, setSeasonalModalOpen] = useState(false);
   const [locationDraft, setLocationDraft] = useState({ coords: "" });
@@ -262,7 +265,8 @@ export function HomestayPage() {
           method: "PATCH",
           body: JSON.stringify({
             imageUrl: asset.publicUrl,
-            altText: altForPatch
+            altText: altForPatch,
+            mediaKind: "IMAGE"
           })
         });
         setReplaceImageId(null);
@@ -275,7 +279,8 @@ export function HomestayPage() {
           body: JSON.stringify({
             imageUrl: asset.publicUrl,
             altText,
-            sortOrder
+            sortOrder,
+            mediaKind: "IMAGE"
           })
         });
         setStatus("Image added to gallery.");
@@ -285,6 +290,28 @@ export function HomestayPage() {
       setGalleryError(err instanceof Error ? err.message : "Could not update gallery.");
     } finally {
       setGalleryBusy(false);
+    }
+  }
+
+  async function uploadThenAddGalleryVideo(file: File | undefined) {
+    if (!file || !data) return;
+    setGalleryError(null);
+    setGalleryBusy(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("sortOrder", String(nextGallerySortOrder(data.homestay.images)));
+      await apiRequest<HomestayImage>("/admin/homestay-images/upload-video", {
+        method: "POST",
+        body: formData
+      });
+      setStatus("Video uploaded and added to gallery.");
+      await refresh({ silent: true });
+    } catch (err) {
+      setGalleryError(err instanceof Error ? err.message : "Video upload failed.");
+    } finally {
+      setGalleryBusy(false);
+      if (addGalleryVideoRef.current) addGalleryVideoRef.current.value = "";
     }
   }
 
@@ -306,7 +333,8 @@ export function HomestayPage() {
         body: JSON.stringify({
           imageUrl: asset.publicUrl,
           altText,
-          sortOrder
+          sortOrder,
+          mediaKind: "IMAGE"
         })
       });
       setStatus("Image uploaded and added to gallery.");
@@ -403,11 +431,12 @@ export function HomestayPage() {
             >
               <X className="h-5 w-5" />
             </button>
-            <h3 className="font-display text-xl font-black text-on-surface">Edit gallery image</h3>
+            <h3 className="font-display text-xl font-black text-on-surface">Edit gallery item</h3>
             <div className="mt-4 overflow-hidden rounded-2xl bg-surface-container">
-              <img
-                src={resolveMediaUrl(editingImage.imageUrl)}
+              <HomestayGalleryMedia
+                imageUrl={editingImage.imageUrl}
                 alt=""
+                mediaKind={editingImage.mediaKind}
                 className="aspect-video w-full object-cover"
               />
             </div>
@@ -804,9 +833,12 @@ export function HomestayPage() {
                   <h3 className="font-display text-xl font-black text-on-surface">Media Gallery</h3>
                 </div>
                 <span className="rounded-full bg-on-surface/5 px-3 py-1 text-[10px] font-bold text-on-surface/40">
-                  {data.homestay.images.length} Images
+                  {data.homestay.images.length} items
                 </span>
               </div>
+              <p className="mb-4 text-xs text-on-surface/45">
+                Short clips: MP4, WebM, or MOV — target under ~5 minutes; max size follows server limit (often 100MB).
+              </p>
 
               <input
                 ref={addGalleryFileRef}
@@ -815,15 +847,28 @@ export function HomestayPage() {
                 className="hidden"
                 onChange={(e) => void uploadThenAddGalleryImage(e.target.files?.[0])}
               />
+              <input
+                ref={addGalleryVideoRef}
+                type="file"
+                accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
+                className="hidden"
+                onChange={(e) => void uploadThenAddGalleryVideo(e.target.files?.[0])}
+              />
 
               <div className="grid grid-cols-2 gap-4">
                  {data.homestay.images.map((image) => (
                     <div key={image.id} className="group relative aspect-square overflow-hidden rounded-[2rem] bg-surface-container">
-                       <img 
-                        src={resolveMediaUrl(image.imageUrl)} 
-                        alt={image.altText} 
-                        className="h-full w-full object-cover transition-transform group-hover:scale-110" 
-                       />
+                       <HomestayGalleryMedia
+                        imageUrl={image.imageUrl}
+                        alt={image.altText}
+                        mediaKind={image.mediaKind}
+                        className="h-full w-full object-cover transition-transform group-hover:scale-110"
+                      />
+                       {image.mediaKind === "VIDEO" ? (
+                         <span className="absolute left-3 top-3 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                           Video
+                         </span>
+                       ) : null}
                        <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                           <button
                             type="button"
@@ -845,7 +890,7 @@ export function HomestayPage() {
                        </div>
                     </div>
                  ))}
-                 <div className="flex aspect-square flex-col gap-2">
+                 <div className="flex min-h-[14rem] flex-col gap-2 sm:min-h-[16rem]">
                    <button
                      type="button"
                      disabled={galleryBusy}
@@ -856,8 +901,22 @@ export function HomestayPage() {
                        <UploadCloud className="h-5 w-5" />
                      </div>
                      <div className="text-center px-2">
-                       <p className="text-sm font-bold text-on-surface">Upload</p>
-                       <p className="text-[10px] text-on-surface/40">New file</p>
+                       <p className="text-sm font-bold text-on-surface">Photo</p>
+                       <p className="text-[10px] text-on-surface/40">Upload image</p>
+                     </div>
+                   </button>
+                   <button
+                     type="button"
+                     disabled={galleryBusy}
+                     onClick={() => addGalleryVideoRef.current?.click()}
+                     className="group relative flex flex-1 flex-col items-center justify-center gap-2 overflow-hidden rounded-[2rem] border-2 border-dashed border-secondary/35 bg-surface-container/20 transition-all hover:border-secondary/50 hover:bg-secondary/5 disabled:opacity-50"
+                   >
+                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary/15 text-secondary transition-transform group-hover:scale-110">
+                       <Video className="h-5 w-5" />
+                     </div>
+                     <div className="text-center px-2">
+                       <p className="text-sm font-bold text-on-surface">Video</p>
+                       <p className="text-[10px] text-on-surface/40">MP4 / WebM / MOV</p>
                      </div>
                    </button>
                    <button
@@ -867,7 +926,7 @@ export function HomestayPage() {
                        setReplaceImageId(null);
                        setPickerOpen(true);
                      }}
-                     className="group flex flex-1 flex-col items-center justify-center gap-2 rounded-[2rem] border border-outline-variant/30 bg-white py-3 transition hover:border-primary/30 hover:bg-primary/5 disabled:opacity-50"
+                     className="group flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-[2rem] border border-outline-variant/30 bg-white py-2 transition hover:border-primary/30 hover:bg-primary/5 disabled:opacity-50"
                    >
                      <ImageIcon className="h-5 w-5 text-primary/70" />
                      <span className="text-[11px] font-bold text-on-surface/70">From library</span>

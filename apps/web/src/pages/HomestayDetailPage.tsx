@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 
-import { apiRequest, resolveMediaUrl } from "../lib/api";
+import { apiRequest } from "../lib/api";
 import { useResource } from "../hooks/useResource";
 import type { SiteContent } from "../types/content";
+import { HomestayGalleryMedia } from "../components/HomestayGalleryMedia";
 import { Button } from "../components/ui/Button";
 import { LoadingBlock } from "../components/ui/LoadingBlock";
 import { StatusBanner } from "../components/ui/StatusBanner";
@@ -148,9 +149,10 @@ export function HomestayDetailPage() {
       <section className="relative w-full">
         <div className="relative aspect-[21/9] min-h-[280px] w-full md:min-h-[420px]">
           {heroImage ? (
-            <img
-              src={resolveMediaUrl(heroImage.imageUrl)}
+            <HomestayGalleryMedia
+              imageUrl={heroImage.imageUrl}
               alt={heroImage.altText}
+              mediaKind={heroImage.mediaKind}
               className="h-full w-full object-cover"
             />
           ) : (
@@ -241,9 +243,10 @@ export function HomestayDetailPage() {
                 className="overflow-hidden rounded-[2rem] bg-surface-container shadow-lg shadow-on-surface/5"
               >
                 <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={resolveMediaUrl(img.imageUrl)}
+                  <HomestayGalleryMedia
+                    imageUrl={img.imageUrl}
                     alt={img.altText}
+                    mediaKind={img.mediaKind}
                     className="h-full w-full object-cover transition duration-700 hover:scale-105"
                   />
                 </div>

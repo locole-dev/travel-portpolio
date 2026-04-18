@@ -43,6 +43,8 @@ const envSchema = z.object({
   COOKIE_NAME: z.string().default("twentynine_admin_token"),
   COOKIE_SECURE: booleanFromEnv.default(false),
   MAX_UPLOAD_SIZE_MB: z.coerce.number().positive().default(5),
+  /** Short homestay clips (~5 min); separate from image avatar/library limit. */
+  MAX_HOMESTAY_VIDEO_UPLOAD_MB: z.coerce.number().positive().default(100),
   SEED_ADMIN_EMAIL: z.string().email().default("admin@twentyninehomestay.local"),
   SEED_ADMIN_PASSWORD: z.string().min(8).default("ChangeMe123!")
 });
@@ -58,5 +60,6 @@ export const env = {
   appOrigins: parsed.APP_ORIGINS.length > 0 ? parsed.APP_ORIGINS : [parsed.APP_ORIGIN],
   packageRoot,
   uploadsDir: path.resolve(packageRoot, "uploads"),
-  maxUploadSizeBytes: parsed.MAX_UPLOAD_SIZE_MB * 1024 * 1024
+  maxUploadSizeBytes: parsed.MAX_UPLOAD_SIZE_MB * 1024 * 1024,
+  maxHomestayVideoUploadBytes: parsed.MAX_HOMESTAY_VIDEO_UPLOAD_MB * 1024 * 1024
 };

@@ -1,6 +1,8 @@
+import type { HomestayMediaKind } from "@prisma/client";
+
 import { HOMESTAY_SECTION_ID } from "../../constants/site.js";
-import { prisma } from "../../lib/prisma.js";
 import { AppError } from "../../lib/errors.js";
+import { prisma } from "../../lib/prisma.js";
 
 const defaultHomestay = {
   id: HOMESTAY_SECTION_ID,
@@ -42,10 +44,19 @@ type HomestaySectionInput = {
 
 type HomestayImageInput = {
   imageUrl: string;
+  mediaKind?: HomestayMediaKind;
   altText: string;
   altTextVi?: string;
   sortOrder: number;
 };
+
+export async function nextHomestayGallerySortOrder() {
+  const agg = await prisma.homestayImage.aggregate({
+    where: { homestaySectionId: HOMESTAY_SECTION_ID },
+    _max: { sortOrder: true }
+  });
+  return (agg._max.sortOrder ?? -1) + 1;
+}
 
 export async function getHomestayContent() {
   const section = await prisma.homestaySection.upsert({
@@ -117,6 +128,7 @@ export async function createHomestayImage(input: HomestayImageInput) {
   return prisma.homestayImage.create({
     data: {
       imageUrl: input.imageUrl,
+      mediaKind: input.mediaKind ?? "IMAGE",
       altText: input.altText,
       altTextVi: input.altTextVi ?? "",
       sortOrder: input.sortOrder,

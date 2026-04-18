@@ -11,6 +11,7 @@ import { apiRequest, resolveMediaUrl } from "../lib/api";
 import { useResource } from "../hooks/useResource";
 import { getIcon } from "../lib/icons";
 import type { ContactMethod, SiteContent } from "../types/content";
+import { HomestayGalleryMedia } from "../components/HomestayGalleryMedia";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { LoadingBlock } from "../components/ui/LoadingBlock";
@@ -566,9 +567,10 @@ export function HomePage() {
                     viewport={{ once: true }}
                     className="w-full md:w-[58%] rounded-[3.5rem] overflow-hidden shadow-2xl shadow-on-surface/5 group relative"
                   >
-                    <img
-                      src={resolveMediaUrl(highlightImages[0].imageUrl)}
+                    <HomestayGalleryMedia
+                      imageUrl={highlightImages[0].imageUrl}
                       alt={highlightImages[0].altText}
+                      mediaKind={highlightImages[0].mediaKind}
                       className="h-full w-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
@@ -586,9 +588,10 @@ export function HomePage() {
                       viewport={{ once: true }}
                       className="flex-1 rounded-[3.5rem] overflow-hidden shadow-xl shadow-on-surface/5 group relative"
                     >
-                      <img
-                        src={resolveMediaUrl(highlightImages[1].imageUrl)}
+                      <HomestayGalleryMedia
+                        imageUrl={highlightImages[1].imageUrl}
                         alt={highlightImages[1].altText}
+                        mediaKind={highlightImages[1].mediaKind}
                         className="h-full w-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
                       />
                     </motion.div>
@@ -623,9 +626,10 @@ export function HomePage() {
                         viewport={{ once: true }}
                         className="min-w-0 flex-1 rounded-[3.5rem] overflow-hidden shadow-xl shadow-on-surface/5 group relative"
                       >
-                        <img
-                          src={resolveMediaUrl(highlightImages[2].imageUrl)}
+                        <HomestayGalleryMedia
+                          imageUrl={highlightImages[2].imageUrl}
                           alt={highlightImages[2].altText}
+                          mediaKind={highlightImages[2].mediaKind}
                           className="h-full w-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
                         />
                       </motion.div>

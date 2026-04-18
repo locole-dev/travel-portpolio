@@ -42,3 +42,30 @@ export const upload = multer({
     callback(null, true);
   }
 });
+
+const homestayVideoMimeTypes = new Set([
+  "video/mp4",
+  "video/webm",
+  "video/quicktime"
+]);
+
+/** Homestay gallery clips only (larger limit than images). */
+export const uploadHomestayVideo = multer({
+  storage,
+  limits: {
+    fileSize: env.maxHomestayVideoUploadBytes
+  },
+  fileFilter: (_request, file, callback) => {
+    if (!homestayVideoMimeTypes.has(file.mimetype)) {
+      callback(
+        new AppError(
+          422,
+          "INVALID_FILE_TYPE",
+          "Only MP4, WebM, or MOV video uploads are allowed for the homestay gallery."
+        )
+      );
+      return;
+    }
+    callback(null, true);
+  }
+});

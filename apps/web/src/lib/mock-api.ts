@@ -179,6 +179,7 @@ We hope this little house feels like a pause worth taking: not flashy, but warm,
           id: "gallery-1",
           homestaySectionId: "homestay_singleton",
           imageUrl: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200",
+          mediaKind: "IMAGE",
           altText: "Grand boutique exterior",
           altTextVi: "",
           sortOrder: 1,
@@ -189,6 +190,7 @@ We hope this little house feels like a pause worth taking: not flashy, but warm,
           id: "gallery-2",
           homestaySectionId: "homestay_singleton",
           imageUrl: "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?q=80&w=1200",
+          mediaKind: "IMAGE",
           altText: "Master suite morning light",
           altTextVi: "",
           sortOrder: 2,
@@ -199,6 +201,7 @@ We hope this little house feels like a pause worth taking: not flashy, but warm,
           id: "gallery-3",
           homestaySectionId: "homestay_singleton",
           imageUrl: "https://images.unsplash.com/photo-1584132915807-fd1f5fbc078f?q=80&w=1200",
+          mediaKind: "IMAGE",
           altText: "Tropical pool side",
           altTextVi: "",
           sortOrder: 3,
@@ -209,6 +212,7 @@ We hope this little house feels like a pause worth taking: not flashy, but warm,
           id: "gallery-4",
           homestaySectionId: "homestay_singleton",
           imageUrl: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200",
+          mediaKind: "IMAGE",
           altText: "Sunlit dining area",
           altTextVi: "",
           sortOrder: 4,
@@ -219,6 +223,7 @@ We hope this little house feels like a pause worth taking: not flashy, but warm,
           id: "gallery-5",
           homestaySectionId: "homestay_singleton",
           imageUrl: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1200",
+          mediaKind: "IMAGE",
           altText: "Luxury architectural design",
           altTextVi: "",
           sortOrder: 5,
@@ -633,8 +638,43 @@ export async function handleMockApiRequest<TData>(
     const body = parseJsonBody<Omit<HomestayImage, "id" | "homestaySectionId">>(init.body);
     const next: HomestayImage = {
       ...body,
+      mediaKind: body.mediaKind ?? "IMAGE",
       id: crypto.randomUUID(),
       homestaySectionId: state.homestay.id,
+      createdAt: now(),
+      updatedAt: now()
+    };
+    state.homestay.images = [...state.homestay.images, next];
+    saveMockState(state);
+    return next as TData;
+  }
+
+  if (path === "/admin/homestay-images/upload-video" && method === "POST") {
+    if (!(init.body instanceof FormData)) {
+      throw new ApiError("A file upload is required.", "FILE_REQUIRED");
+    }
+    const file = init.body.get("file");
+    if (!(file instanceof File)) {
+      throw new ApiError("A file upload is required.", "FILE_REQUIRED");
+    }
+    const publicUrl = await fileToDataUrl(file);
+    const rawOrder = init.body.get("sortOrder");
+    let sortOrder =
+      state.homestay.images.length === 0
+        ? 0
+        : Math.max(...state.homestay.images.map((i) => i.sortOrder)) + 1;
+    if (typeof rawOrder === "string" && rawOrder !== "") {
+      const n = Number(rawOrder);
+      if (Number.isInteger(n) && n >= 0) sortOrder = n;
+    }
+    const next: HomestayImage = {
+      id: crypto.randomUUID(),
+      homestaySectionId: state.homestay.id,
+      imageUrl: publicUrl,
+      mediaKind: "VIDEO",
+      altText: "Homestay video",
+      altTextVi: "",
+      sortOrder,
       createdAt: now(),
       updatedAt: now()
     };

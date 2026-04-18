@@ -12,6 +12,11 @@ enum AdminRole {
   SUPER_ADMIN
 }
 
+enum HomestayMediaKind {
+  IMAGE
+  VIDEO
+}
+
 model Profile {
   id                       String          @id
   fullName                 String
@@ -75,12 +80,13 @@ model HomestaySection {
 }
 
 model HomestayImage {
-  id                String          @id @default(cuid())
+  id                String             @id @default(cuid())
   homestaySectionId String
   imageUrl          String
+  mediaKind         HomestayMediaKind  @default(IMAGE)
   altText           String
-  altTextVi         String          @default("")
-  sortOrder         Int             @default(0)
+  altTextVi         String             @default("")
+  sortOrder         Int                @default(0)
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
   homestaySection   HomestaySection @relation(fields: [homestaySectionId], references: [id], onDelete: Cascade)

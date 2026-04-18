@@ -10,7 +10,7 @@ import { SiGmail, SiKakaotalk, SiLine, SiWechat, SiZalo } from "react-icons/si";
 import { apiRequest, resolveMediaUrl } from "../lib/api";
 import { useResource } from "../hooks/useResource";
 import { getIcon } from "../lib/icons";
-import type { ContactMethod, SiteContent } from "../types/content";
+import type { ContactMethod, HomestayImage, SiteContent } from "../types/content";
 import { HomestayGalleryMedia } from "../components/HomestayGalleryMedia";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
@@ -86,6 +86,22 @@ function RevealSection({
 
 const SCROLL_LOCK_MS = 900;
 
+/** Homepage gallery: focal slot (58% width) prefers the first video when present. */
+function buildHomestayHighlightSlots(
+  images: HomestayImage[]
+): [HomestayImage | undefined, HomestayImage | undefined, HomestayImage | undefined] {
+  if (images.length === 0) return [undefined, undefined, undefined];
+  const sorted = [...images].sort(
+    (a, b) => a.sortOrder - b.sortOrder || a.id.localeCompare(b.id)
+  );
+  const firstVideo = sorted.find((i) => i.mediaKind === "VIDEO");
+  if (firstVideo) {
+    const rest = sorted.filter((i) => i.id !== firstVideo.id);
+    return [firstVideo, rest[0], rest[1]];
+  }
+  return [sorted[0], sorted[1], sorted[2]];
+}
+
 /* ══════════════════════════════════════════════ */
 /*  HomePage                                      */
 /* ══════════════════════════════════════════════ */
@@ -130,6 +146,12 @@ export function HomePage() {
     [locale]
   );
   const { data, loading, error } = useResource(loadSiteContent);
+
+  const homestayImages = data?.homestay?.images ?? [];
+  const homestayHighlightSlots = useMemo(
+    () => buildHomestayHighlightSlots(homestayImages),
+    [homestayImages]
+  );
 
   /* ── UI state (declared before any conditional return) ── */
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -206,8 +228,6 @@ export function HomePage() {
 
   /* ── Derived data ── */
   const heroAvatar = resolveMediaUrl(data.profile.avatarImage) || fallbackAvatar;
-  const homestayImages = data.homestay?.images ?? [];
-  const highlightImages = homestayImages.slice(0, 5);
 
   /* ── Click handler for nav items ── */
   const handleNavClick = (item: NavItem) => (e: React.MouseEvent) => {
@@ -562,7 +582,7 @@ export function HomePage() {
               {/* Right: Proportional Editorial Gallery */}
               <div className="flex h-auto min-w-0 max-w-full flex-col items-stretch gap-6 md:h-[620px] md:flex-row">
                 {/* ── Focal Architectural Feature (58% width) ── */}
-                {highlightImages[0] && (
+                {homestayHighlightSlots[0] && (
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.98 }}
                     whileInView={{ opacity: 1, scale: 1 }}
@@ -571,19 +591,25 @@ export function HomePage() {
                     className="w-full md:w-[58%] rounded-[3.5rem] overflow-hidden shadow-2xl shadow-on-surface/5 group relative"
                   >
                     <HomestayGalleryMedia
-                      imageUrl={highlightImages[0].imageUrl}
-                      alt={highlightImages[0].altText}
-                      mediaKind={highlightImages[0].mediaKind}
-                      className="h-full w-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+                      imageUrl={homestayHighlightSlots[0].imageUrl}
+                      alt={homestayHighlightSlots[0].altText}
+                      mediaKind={homestayHighlightSlots[0].mediaKind}
+                      className={
+                        homestayHighlightSlots[0].mediaKind === "VIDEO"
+                          ? "h-full w-full object-cover"
+                          : "h-full w-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+                      }
                     />
-                    <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors duration-500" />
+                    {homestayHighlightSlots[0].mediaKind !== "VIDEO" ? (
+                      <div className="pointer-events-none absolute inset-0 bg-black/5 transition-colors duration-500 group-hover:bg-transparent" />
+                    ) : null}
                   </motion.div>
                 )}
 
                 {/* ── Stacked Detail Column (42% width) ── */}
                 <div className="flex min-w-0 w-full max-w-full flex-col gap-6 md:w-[42%]">
                   {/* Top: Elegant Suite Detail */}
-                  {highlightImages[1] && (
+                  {homestayHighlightSlots[1] && (
                     <motion.div 
                       initial={{ opacity: 0, x: 20 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -592,10 +618,14 @@ export function HomePage() {
                       className="flex-1 rounded-[3.5rem] overflow-hidden shadow-xl shadow-on-surface/5 group relative"
                     >
                       <HomestayGalleryMedia
-                        imageUrl={highlightImages[1].imageUrl}
-                        alt={highlightImages[1].altText}
-                        mediaKind={highlightImages[1].mediaKind}
-                        className="h-full w-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+                        imageUrl={homestayHighlightSlots[1].imageUrl}
+                        alt={homestayHighlightSlots[1].altText}
+                        mediaKind={homestayHighlightSlots[1].mediaKind}
+                        className={
+                          homestayHighlightSlots[1].mediaKind === "VIDEO"
+                            ? "h-full w-full object-cover"
+                            : "h-full w-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+                        }
                       />
                     </motion.div>
                   )}
@@ -621,7 +651,7 @@ export function HomePage() {
                     </motion.div>
 
                     {/* Architectural Detail */}
-                    {highlightImages[2] && (
+                    {homestayHighlightSlots[2] && (
                       <motion.div 
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
@@ -630,10 +660,14 @@ export function HomePage() {
                         className="min-w-0 flex-1 rounded-[3.5rem] overflow-hidden shadow-xl shadow-on-surface/5 group relative"
                       >
                         <HomestayGalleryMedia
-                          imageUrl={highlightImages[2].imageUrl}
-                          alt={highlightImages[2].altText}
-                          mediaKind={highlightImages[2].mediaKind}
-                          className="h-full w-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+                          imageUrl={homestayHighlightSlots[2].imageUrl}
+                          alt={homestayHighlightSlots[2].altText}
+                          mediaKind={homestayHighlightSlots[2].mediaKind}
+                          className={
+                            homestayHighlightSlots[2].mediaKind === "VIDEO"
+                              ? "h-full w-full object-cover"
+                              : "h-full w-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+                          }
                         />
                       </motion.div>
                     )}

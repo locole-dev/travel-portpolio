@@ -15,7 +15,7 @@ import {
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
-import { apiRequest, resolveMediaUrl } from "../../lib/api";
+import { apiRequest } from "../../lib/api";
 import type { HomestayImage, HomestaySection, MediaAsset } from "../../types/content";
 import { useResource } from "../../hooks/useResource";
 import { HomestayGalleryMedia } from "../../components/HomestayGalleryMedia";
@@ -456,23 +456,40 @@ export function HomestayPage() {
                 />
               </Field>
             </div>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button
+                  type="button"
+                  disabled={galleryBusy}
+                  className="flex-1 !rounded-xl"
+                  onClick={() => void saveEditAlt()}
+                >
+                  Save alt text
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={galleryBusy}
+                  className="flex-1 !rounded-xl"
+                  onClick={openReplacePickerFromEditor}
+                >
+                  Change image
+                </Button>
+              </div>
               <Button
                 type="button"
+                variant="danger"
                 disabled={galleryBusy}
-                className="flex-1 !rounded-xl"
-                onClick={() => void saveEditAlt()}
+                className="w-full !rounded-xl flex items-center justify-center gap-2"
+                onClick={() => {
+                  if (editingImage) {
+                    void deleteGalleryImage(editingImage.id);
+                    setEditingImage(null);
+                  }
+                }}
               >
-                Save alt text
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                disabled={galleryBusy}
-                className="flex-1 !rounded-xl"
-                onClick={openReplacePickerFromEditor}
-              >
-                Change image
+                <Trash2 className="h-4 w-4" />
+                Delete from gallery
               </Button>
             </div>
           </Card>
@@ -645,7 +662,7 @@ export function HomestayPage() {
             Refine your homestay's presence. Every detail here shapes the guest's first impression.
           </p>
         </div>
-        
+
         <div className="flex items-center gap-3">
           <Link
             to="/homestay"
@@ -673,290 +690,330 @@ export function HomestayPage() {
       <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[1.1fr_minmax(0,0.9fr)] min-w-0">
         {/* Left: Section Details */}
         <div className="flex flex-col gap-8">
-           <Card className="p-8 border-none shadow-card">
-              <div className="mb-8 flex items-center gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <FileText className="h-5 w-5" />
-                </div>
-                <h3 className="font-display text-xl font-black text-on-surface">Core Information</h3>
+          <Card className="p-8 border-none shadow-card">
+            <div className="mb-8 flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <FileText className="h-5 w-5" />
               </div>
+              <h3 className="font-display text-xl font-black text-on-surface">Core Information</h3>
+            </div>
 
-              <div className="grid grid-cols-1 gap-8">
-                <Field label="Section Title">
-                   <input
-                    className="h-14 w-full rounded-xl border border-outline-variant/30 bg-white px-5 text-base font-medium outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
-                    value={sectionForm.title}
-                    onChange={(e) => setSectionForm(p => ({ ...p, title: e.target.value }))}
-                  />
-                </Field>
+            <div className="grid grid-cols-1 gap-8">
+              <Field label="Section Title">
+                <input
+                  className="h-14 w-full rounded-xl border border-outline-variant/30 bg-white px-5 text-base font-medium outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
+                  value={sectionForm.title}
+                  onChange={(e) => setSectionForm(p => ({ ...p, title: e.target.value }))}
+                />
+              </Field>
 
-                <Field
-                  label="Preview description (homepage)"
-                  help="Short teaser for the home page (max 500 characters)."
-                >
-                  <textarea
-                    className="min-h-28 w-full rounded-xl border border-outline-variant/30 bg-white p-5 text-base font-medium leading-relaxed text-on-surface/70 outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
-                    maxLength={500}
-                    value={sectionForm.previewDescription}
-                    onChange={(e) =>
-                      setSectionForm((p) => ({ ...p, previewDescription: e.target.value }))
-                    }
-                  />
-                  <p className="mt-1 text-xs text-on-surface/40">
-                    {sectionForm.previewDescription.length}/500
-                  </p>
-                </Field>
+              <Field
+                label="Preview description (homepage)"
+                help="Short teaser for the home page (max 500 characters)."
+              >
+                <textarea
+                  className="min-h-28 w-full rounded-xl border border-outline-variant/30 bg-white p-5 text-base font-medium leading-relaxed text-on-surface/70 outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
+                  maxLength={500}
+                  value={sectionForm.previewDescription}
+                  onChange={(e) =>
+                    setSectionForm((p) => ({ ...p, previewDescription: e.target.value }))
+                  }
+                />
+                <p className="mt-1 text-xs text-on-surface/40">
+                  {sectionForm.previewDescription.length}/500
+                </p>
+              </Field>
 
-                <Field
-                  label="Full description (stay detail page)"
-                  help="Long-form story shown on /homestay (max 10,000 characters)."
-                >
-                  <div className="overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container/30">
-                     <div className="flex items-center gap-1 border-b border-outline-variant/30 bg-surface-container/50 px-3 py-2">
-                        {['B', 'I', 'U', 'S'].map(t => (
-                          <button key={t} type="button" className="h-8 w-8 rounded-lg text-xs font-bold hover:bg-white">{t}</button>
-                        ))}
-                     </div>
-                     <textarea
-                      className="min-h-64 w-full bg-white p-6 text-base font-medium leading-[1.8] text-on-surface/70 outline-none"
-                      maxLength={10000}
-                      value={sectionForm.description}
-                      onChange={(e) => setSectionForm(p => ({ ...p, description: e.target.value }))}
-                    />
+              <Field
+                label="Full description (stay detail page)"
+                help="Long-form story shown on /homestay (max 10,000 characters)."
+              >
+                <div className="overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container/30">
+                  <div className="flex items-center gap-1 border-b border-outline-variant/30 bg-surface-container/50 px-3 py-2">
+                    {['B', 'I', 'U', 'S'].map(t => (
+                      <button key={t} type="button" className="h-8 w-8 rounded-lg text-xs font-bold hover:bg-white">{t}</button>
+                    ))}
                   </div>
-                  <p className="mt-1 text-xs text-on-surface/40">
-                    {sectionForm.description.length}/10000
-                  </p>
-                </Field>
+                  <textarea
+                    className="min-h-64 w-full bg-white p-6 text-base font-medium leading-[1.8] text-on-surface/70 outline-none"
+                    maxLength={10000}
+                    value={sectionForm.description}
+                    onChange={(e) => setSectionForm(p => ({ ...p, description: e.target.value }))}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-on-surface/40">
+                  {sectionForm.description.length}/10000
+                </p>
+              </Field>
 
-                <div className="rounded-2xl border border-dashed border-outline-variant/35 bg-surface-container/20 p-6">
-                  <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-on-surface/40">
-                    Vietnamese (optional)
-                  </p>
-                  <Field label="Section title (VI)">
-                    <input
-                      className="h-12 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
-                      value={sectionForm.titleVi}
-                      onChange={(e) => setSectionForm((p) => ({ ...p, titleVi: e.target.value }))}
+              <div className="rounded-2xl border border-dashed border-outline-variant/35 bg-surface-container/20 p-6">
+                <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-on-surface/40">
+                  Vietnamese (optional)
+                </p>
+                <Field label="Section title (VI)">
+                  <input
+                    className="h-12 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
+                    value={sectionForm.titleVi}
+                    onChange={(e) => setSectionForm((p) => ({ ...p, titleVi: e.target.value }))}
+                  />
+                </Field>
+                <div className="mt-4">
+                  <Field label="Preview description (VI)" help="Homepage teaser in Vietnamese.">
+                    <textarea
+                      className="min-h-24 w-full rounded-xl border border-outline-variant/30 bg-white p-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
+                      maxLength={500}
+                      value={sectionForm.previewDescriptionVi}
+                      onChange={(e) =>
+                        setSectionForm((p) => ({ ...p, previewDescriptionVi: e.target.value }))
+                      }
                     />
                   </Field>
-                  <div className="mt-4">
-                    <Field label="Preview description (VI)" help="Homepage teaser in Vietnamese.">
-                      <textarea
-                        className="min-h-24 w-full rounded-xl border border-outline-variant/30 bg-white p-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
-                        maxLength={500}
-                        value={sectionForm.previewDescriptionVi}
-                        onChange={(e) =>
-                          setSectionForm((p) => ({ ...p, previewDescriptionVi: e.target.value }))
-                        }
-                      />
-                    </Field>
-                  </div>
-                  <div className="mt-4">
-                    <Field label="Full description (VI)" help="Long story for /homestay in Vietnamese.">
-                      <textarea
-                        className="min-h-48 w-full rounded-xl border border-outline-variant/30 bg-white p-4 text-sm font-medium leading-relaxed outline-none focus:ring-4 focus:ring-primary/5"
-                        maxLength={10000}
-                        value={sectionForm.descriptionVi}
-                        onChange={(e) =>
-                          setSectionForm((p) => ({ ...p, descriptionVi: e.target.value }))
-                        }
-                      />
-                    </Field>
-                  </div>
                 </div>
-
-                <Field
-                  label="Map caption (English, optional)"
-                  help="Short line above the embedded map on the stay page."
-                >
-                  <input
-                    className="h-12 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
-                    value={sectionForm.locationLabel ?? ""}
-                    onChange={(e) => {
-                      const v = e.target.value.trim();
-                      setSectionForm((p) => ({ ...p, locationLabel: v ? v : null }));
-                    }}
-                  />
-                </Field>
-                <Field label="Map caption (Vietnamese, optional)">
-                  <input
-                    className="h-12 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
-                    value={sectionForm.locationLabelVi}
-                    onChange={(e) =>
-                      setSectionForm((p) => ({ ...p, locationLabelVi: e.target.value }))
-                    }
-                  />
-                </Field>
+                <div className="mt-4">
+                  <Field label="Full description (VI)" help="Long story for /homestay in Vietnamese.">
+                    <textarea
+                      className="min-h-48 w-full rounded-xl border border-outline-variant/30 bg-white p-4 text-sm font-medium leading-relaxed outline-none focus:ring-4 focus:ring-primary/5"
+                      maxLength={10000}
+                      value={sectionForm.descriptionVi}
+                      onChange={(e) =>
+                        setSectionForm((p) => ({ ...p, descriptionVi: e.target.value }))
+                      }
+                    />
+                  </Field>
+                </div>
               </div>
-           </Card>
 
-           {/* Quick Actions */}
-           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <button
-                type="button"
-                onClick={openLocationModal}
-                className="glass-card group flex w-full cursor-pointer items-center gap-5 border-none p-6 text-left shadow-card transition-colors hover:bg-white"
+              <Field
+                label="Map caption (English, optional)"
+                help="Short line above the embedded map on the stay page."
               >
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#D6F5F9] text-[#006479]">
-                    <MapPin className="h-7 w-7" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-on-surface">Update Location</h4>
-                    <p className="mt-1 text-xs font-bold text-on-surface/30">Pin your coordinates</p>
-                  </div>
-              </button>
-              <button
-                type="button"
-                onClick={openSeasonalModal}
-                className="glass-card group flex w-full cursor-pointer items-center gap-5 border-none p-6 text-left shadow-card transition-colors hover:bg-white"
-              >
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#FDF2F0] text-[#A03A0F]">
-                    <DollarSign className="h-7 w-7" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-on-surface">Seasonal Rates</h4>
-                    <p className="mt-1 text-xs font-bold text-on-surface/30">Adjust pricing logic</p>
-                  </div>
-              </button>
-           </div>
+                <input
+                  className="h-12 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
+                  value={sectionForm.locationLabel ?? ""}
+                  onChange={(e) => {
+                    const v = e.target.value.trim();
+                    setSectionForm((p) => ({ ...p, locationLabel: v ? v : null }));
+                  }}
+                />
+              </Field>
+              <Field label="Map caption (Vietnamese, optional)">
+                <input
+                  className="h-12 w-full rounded-xl border border-outline-variant/30 bg-white px-4 text-sm font-medium outline-none focus:ring-4 focus:ring-primary/5"
+                  value={sectionForm.locationLabelVi}
+                  onChange={(e) =>
+                    setSectionForm((p) => ({ ...p, locationLabelVi: e.target.value }))
+                  }
+                />
+              </Field>
+            </div>
+          </Card>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <button
+              type="button"
+              onClick={openLocationModal}
+              className="glass-card group flex w-full cursor-pointer items-center gap-5 border-none p-6 text-left shadow-card transition-colors hover:bg-white"
+            >
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#D6F5F9] text-[#006479]">
+                <MapPin className="h-7 w-7" />
+              </div>
+              <div>
+                <h4 className="font-bold text-on-surface">Update Location</h4>
+                <p className="mt-1 text-xs font-bold text-on-surface/30">Pin your coordinates</p>
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={openSeasonalModal}
+              className="glass-card group flex w-full cursor-pointer items-center gap-5 border-none p-6 text-left shadow-card transition-colors hover:bg-white"
+            >
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#FDF2F0] text-[#A03A0F]">
+                <DollarSign className="h-7 w-7" />
+              </div>
+              <div>
+                <h4 className="font-bold text-on-surface">Seasonal Rates</h4>
+                <p className="mt-1 text-xs font-bold text-on-surface/30">Adjust pricing logic</p>
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* Right: Media Gallery */}
         <div className="flex flex-col gap-8">
-           <Card className="p-8 border-none shadow-card">
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
-                    <ImageIcon className="h-5 w-5" />
-                  </div>
-                  <h3 className="font-display text-xl font-black text-on-surface">Media Gallery</h3>
+          <Card className="p-8 border-none shadow-card">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+                  <ImageIcon className="h-5 w-5" />
                 </div>
-                <span className="rounded-full bg-on-surface/5 px-3 py-1 text-[10px] font-bold text-on-surface/40">
-                  {data.homestay.images.length} items
-                </span>
+                <h3 className="font-display text-xl font-black text-on-surface">Media Gallery</h3>
               </div>
-              <p className="mb-4 text-xs text-on-surface/45">
-                Short clips: MP4, WebM, or MOV — target under ~5 minutes; max size follows server limit (often 100MB).
-              </p>
+              <span className="rounded-full bg-on-surface/5 px-3 py-1 text-[10px] font-bold text-on-surface/40">
+                {data.homestay.images.length} items
+              </span>
+            </div>
+            <p className="mb-4 text-xs text-on-surface/45">
+              Short clips: MP4, WebM, or MOV — target under ~5 minutes; max size follows server limit (often 100MB).
+            </p>
 
-              <input
-                ref={addGalleryFileRef}
-                type="file"
-                accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                className="hidden"
-                onChange={(e) => void uploadThenAddGalleryImage(e.target.files?.[0])}
-              />
-              <input
-                ref={addGalleryVideoRef}
-                type="file"
-                accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
-                className="hidden"
-                onChange={(e) => void uploadThenAddGalleryVideo(e.target.files?.[0])}
-              />
+            <input
+              ref={addGalleryFileRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              className="hidden"
+              onChange={(e) => void uploadThenAddGalleryImage(e.target.files?.[0])}
+            />
+            <input
+              ref={addGalleryVideoRef}
+              type="file"
+              accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
+              className="hidden"
+              onChange={(e) => void uploadThenAddGalleryVideo(e.target.files?.[0])}
+            />
 
-              <div className="grid grid-cols-2 gap-4">
-                 {data.homestay.images.map((image) => (
-                    <div key={image.id} className="group relative aspect-square overflow-hidden rounded-[2rem] bg-surface-container">
-                       <HomestayGalleryMedia
-                        imageUrl={image.imageUrl}
-                        alt={image.altText}
-                        mediaKind={image.mediaKind}
-                        className="h-full w-full object-cover transition-transform group-hover:scale-110"
-                      />
-                       {image.mediaKind === "VIDEO" ? (
-                         <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-                           Video
-                         </span>
-                       ) : null}
-                       <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100">
-                          <button
-                            type="button"
-                            className="h-10 w-10 rounded-full bg-white text-on-surface flex items-center justify-center shadow-lg hover:scale-110"
-                            onClick={() => {
-                              setEditingImage(image);
-                              setEditAltDraft(image.altText);
-                            }}
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                          <button
-                            type="button"
-                            className="h-10 w-10 rounded-full bg-white text-tertiary flex items-center justify-center shadow-lg hover:scale-110"
-                            onClick={() => void deleteGalleryImage(image.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                       </div>
-                    </div>
-                 ))}
-                 <div className="flex min-h-[14rem] flex-col gap-2 sm:min-h-[16rem]">
-                   <button
-                     type="button"
-                     disabled={galleryBusy}
-                     onClick={() => addGalleryFileRef.current?.click()}
-                     className="group relative flex flex-1 flex-col items-center justify-center gap-2 overflow-hidden rounded-[2rem] border-2 border-dashed border-outline-variant/50 bg-surface-container/20 transition-all hover:border-primary/40 hover:bg-primary/5 disabled:opacity-50"
-                   >
-                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform group-hover:scale-110">
-                       <UploadCloud className="h-5 w-5" />
-                     </div>
-                     <div className="text-center px-2">
-                       <p className="text-sm font-bold text-on-surface">Photo</p>
-                       <p className="text-[10px] text-on-surface/40">Upload image</p>
-                     </div>
-                   </button>
-                   <button
-                     type="button"
-                     disabled={galleryBusy}
-                     onClick={() => addGalleryVideoRef.current?.click()}
-                     className="group relative flex flex-1 flex-col items-center justify-center gap-2 overflow-hidden rounded-[2rem] border-2 border-dashed border-secondary/35 bg-surface-container/20 transition-all hover:border-secondary/50 hover:bg-secondary/5 disabled:opacity-50"
-                   >
-                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary/15 text-secondary transition-transform group-hover:scale-110">
-                       <Video className="h-5 w-5" />
-                     </div>
-                     <div className="text-center px-2">
-                       <p className="text-sm font-bold text-on-surface">Video</p>
-                       <p className="text-[10px] text-on-surface/40">MP4 / WebM / MOV</p>
-                     </div>
-                   </button>
-                   <button
-                     type="button"
-                     disabled={galleryBusy}
-                     onClick={() => {
-                       setReplaceImageId(null);
-                       setPickerOpen(true);
-                     }}
-                     className="group flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-[2rem] border border-outline-variant/30 bg-white py-2 transition hover:border-primary/30 hover:bg-primary/5 disabled:opacity-50"
-                   >
-                     <ImageIcon className="h-5 w-5 text-primary/70" />
-                     <span className="text-[11px] font-bold text-on-surface/70">From library</span>
-                   </button>
-                 </div>
-              </div>
-           </Card>
-
-           {/* Live Status Toggle */}
-           <Card className="p-6 rounded-[2.5rem] border-none shadow-card relative overflow-hidden bg-white">
-              <div className="absolute left-0 inset-y-0 w-1.5 bg-[#006479]" />
-              <div className="flex flex-row items-center justify-between gap-4 px-2">
-                 <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006479]">LIVE STATUS</p>
-                    <h4 className="mt-1 font-display text-xl font-black text-on-surface">
-                       {sectionForm.isActive ? "Currently Published" : "Hidden from Public"}
-                    </h4>
-                 </div>
-                 <button 
+            <div className="grid grid-cols-2 gap-4">
+              {data.homestay.images.map((image) => (
+                <div
+                  key={image.id}
+                  onClick={() => {
+                    setEditingImage(image);
+                    setEditAltDraft(image.altText);
+                  }}
+                  className="group cursor-pointer relative aspect-square overflow-hidden rounded-[2rem] bg-surface-container"
+                >
+                  <HomestayGalleryMedia
+                    imageUrl={image.imageUrl}
+                    alt={image.altText}
+                    mediaKind={image.mediaKind}
+                    className="h-full w-full object-cover transition-transform group-hover:scale-110"
+                  />
+                  {image.mediaKind === "VIDEO" ? (
+                    <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                      Video
+                    </span>
+                  ) : null}
+                  {/* Mobile / touch: always-visible controls (hover overlay is unusable without a fine pointer) */}
+                  <div className="absolute bottom-2 right-2 z-20 flex gap-2 pointer-events-none lg:hidden">
+                    <button
+                      type="button"
+                      aria-label="Edit media"
+                      className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full bg-white text-on-surface shadow-lg active:scale-95"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingImage(image);
+                        setEditAltDraft(image.altText);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Remove from gallery"
+                      className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full bg-white text-tertiary shadow-lg active:scale-95"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void deleteGalleryImage(image.id);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                  {/* lg+: centered overlay on hover (fine pointer / desktop) */}
+                  <div className="pointer-events-none absolute inset-0 z-10 hidden lg:flex items-center justify-center gap-2 bg-black/40 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100">
+                    <button
+                      type="button"
+                      aria-label="Edit media"
+                      className="h-10 w-10 rounded-full bg-white text-on-surface flex items-center justify-center shadow-lg hover:scale-110"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingImage(image);
+                        setEditAltDraft(image.altText);
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="Remove from gallery"
+                      className="h-10 w-10 rounded-full bg-white text-tertiary flex items-center justify-center shadow-lg hover:scale-110"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void deleteGalleryImage(image.id);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <div className="flex min-h-[14rem] flex-col gap-2 sm:min-h-[16rem]">
+                <button
                   type="button"
-                  onClick={() => toggleStatus(!sectionForm.isActive)}
-                  className={`relative h-10 w-18 rounded-full transition-colors ${sectionForm.isActive ? 'bg-[#006479]' : 'bg-on-surface/10'}`}
-                 >
-                    <motion.div 
-                      animate={{ x: sectionForm.isActive ? 34 : 4 }}
-                      className="h-8 w-8 rounded-full bg-white shadow-md flex items-center justify-center"
-                    />
-                 </button>
+                  disabled={galleryBusy}
+                  onClick={() => addGalleryFileRef.current?.click()}
+                  className="group relative flex flex-1 flex-col items-center justify-center gap-2 overflow-hidden rounded-[2rem] border-2 border-dashed border-outline-variant/50 bg-surface-container/20 transition-all hover:border-primary/40 hover:bg-primary/5 disabled:opacity-50"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform group-hover:scale-110">
+                    <UploadCloud className="h-5 w-5" />
+                  </div>
+                  <div className="text-center px-2">
+                    <p className="text-sm font-bold text-on-surface">Photo</p>
+                    <p className="text-[10px] text-on-surface/40">Upload image</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  disabled={galleryBusy}
+                  onClick={() => addGalleryVideoRef.current?.click()}
+                  className="group relative flex flex-1 flex-col items-center justify-center gap-2 overflow-hidden rounded-[2rem] border-2 border-dashed border-secondary/35 bg-surface-container/20 transition-all hover:border-secondary/50 hover:bg-secondary/5 disabled:opacity-50"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary/15 text-secondary transition-transform group-hover:scale-110">
+                    <Video className="h-5 w-5" />
+                  </div>
+                  <div className="text-center px-2">
+                    <p className="text-sm font-bold text-on-surface">Video</p>
+                    <p className="text-[10px] text-on-surface/40">MP4 / WebM / MOV</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  disabled={galleryBusy}
+                  onClick={() => {
+                    setReplaceImageId(null);
+                    setPickerOpen(true);
+                  }}
+                  className="group flex min-h-[3.25rem] flex-col items-center justify-center gap-1 rounded-[2rem] border border-outline-variant/30 bg-white py-2 transition hover:border-primary/30 hover:bg-primary/5 disabled:opacity-50"
+                >
+                  <ImageIcon className="h-5 w-5 text-primary/70" />
+                  <span className="text-[11px] font-bold text-on-surface/70">From library</span>
+                </button>
               </div>
-           </Card>
+            </div>
+          </Card>
+
+          {/* Live Status Toggle */}
+          <Card className="p-6 rounded-[2.5rem] border-none shadow-card relative overflow-hidden bg-white">
+            <div className="absolute left-0 inset-y-0 w-1.5 bg-[#006479]" />
+            <div className="flex flex-row items-center justify-between gap-4 px-2">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#006479]">LIVE STATUS</p>
+                <h4 className="mt-1 font-display text-xl font-black text-on-surface">
+                  {sectionForm.isActive ? "Currently Published" : "Hidden from Public"}
+                </h4>
+              </div>
+              <button
+                type="button"
+                onClick={() => toggleStatus(!sectionForm.isActive)}
+                className={`relative h-10 w-18 rounded-full transition-colors ${sectionForm.isActive ? 'bg-[#006479]' : 'bg-on-surface/10'}`}
+              >
+                <motion.div
+                  animate={{ x: sectionForm.isActive ? 34 : 4 }}
+                  className="h-8 w-8 rounded-full bg-white shadow-md flex items-center justify-center"
+                />
+              </button>
+            </div>
+          </Card>
         </div>
       </div>
     </div>

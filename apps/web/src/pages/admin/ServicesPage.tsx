@@ -152,7 +152,7 @@ export function ServicesPage() {
                     <p className="mt-1 text-sm text-on-surface/40 line-clamp-2 leading-relaxed">{service.description}</p>
                  </div>
 
-                 <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                 <div className="flex flex-col gap-2 opacity-0 md:group-hover:opacity-100 transition-opacity hidden md:flex">
                     <button 
                       onClick={(e) => { e.stopPropagation(); setEditingId(service.id); }}
                       className="h-9 w-9 rounded-xl bg-surface-container flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
@@ -281,15 +281,26 @@ export function ServicesPage() {
                       <Save className="h-4 w-4 mr-2" />
                       {submitting ? "Saving..." : "Save Item"}
                     </Button>
-                    {editingId && (
-                       <Button 
-                        variant="secondary" 
-                        onClick={() => setEditingId(null)}
-                        className="!h-14 !w-14 !rounded-xl flex items-center justify-center"
-                       >
+                    {editingId ? (
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="danger" 
+                          onClick={() => void handleDelete(editingId)}
+                          className="!h-14 !w-14 !rounded-xl flex items-center justify-center"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </Button>
+                        <Button 
+                          variant="secondary" 
+                          onClick={() => setEditingId(null)}
+                          className="!h-14 !w-14 !rounded-xl flex items-center justify-center"
+                          title="Cancel"
+                        >
                           <Plus className="h-5 w-5 rotate-45" />
-                       </Button>
-                    )}
+                        </Button>
+                      </div>
+                    ) : null}
                  </div>
               </form>
            </Card>

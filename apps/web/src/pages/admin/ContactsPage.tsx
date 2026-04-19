@@ -169,7 +169,7 @@ export function ContactsPage() {
                       <p className="mt-1 text-sm text-on-surface/40 truncate font-mono uppercase tracking-wider">{contact.platform}</p>
                    </div>
 
-                   <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                   <div className="flex gap-2 opacity-0 md:group-hover:opacity-100 transition-opacity hidden md:flex">
                       <button 
                         onClick={(e) => { e.stopPropagation(); setEditingId(contact.id); }}
                         className="h-9 w-9 rounded-xl bg-surface-container flex items-center justify-center hover:bg-primary hover:text-white transition-colors"
@@ -272,21 +272,32 @@ export function ContactsPage() {
                     <span className="text-sm font-bold text-on-surface/60 group-hover:text-on-surface transition-colors">Visible on Site</span>
                  </button>
 
-                 <div className="flex gap-3 mt-4">
+                  <div className="flex gap-3 mt-4">
                     <Button type="submit" disabled={submitting} className="flex-1 !h-14 !rounded-xl">
                       <Save className="h-4 w-4 mr-2" />
                       {submitting ? "Saving..." : "Save Channel"}
                     </Button>
-                    {editingId && (
-                       <Button 
-                        variant="secondary" 
-                        onClick={() => setEditingId(null)}
-                        className="!h-14 !w-14 !rounded-xl flex items-center justify-center"
-                       >
+                    {editingId ? (
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="danger" 
+                          onClick={() => void handleDelete(editingId)}
+                          className="!h-14 !w-14 !rounded-xl flex items-center justify-center"
+                          title="Delete"
+                        >
+                          <Trash2 className="h-5 w-5" />
+                        </Button>
+                        <Button 
+                          variant="secondary" 
+                          onClick={() => setEditingId(null)}
+                          className="!h-14 !w-14 !rounded-xl flex items-center justify-center"
+                          title="Cancel"
+                        >
                           <Plus className="h-5 w-5 rotate-45" />
-                       </Button>
-                    )}
-                 </div>
+                        </Button>
+                      </div>
+                    ) : null}
+                  </div>
               </form>
            </Card>
         </div>

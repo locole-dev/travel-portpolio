@@ -373,8 +373,8 @@ export function ProfilePage() {
               <h3 className="font-display text-xl font-black text-on-surface">Personal Identity</h3>
             </div>
 
-            <div className="grid gap-6">
-              <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <Field label="Full Name">
                   <input
                     className="h-14 w-full rounded-xl border border-outline-variant/50 bg-white px-5 text-sm font-medium outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
@@ -409,7 +409,7 @@ export function ProfilePage() {
                 <p className="mb-4 text-[10px] font-black uppercase tracking-[0.2em] text-on-surface/40">
                   Vietnamese (optional) — public site when guest chooses Tiếng Việt
                 </p>
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <Field label="Full name (VI)">
                     <input
                       className="h-14 w-full rounded-xl border border-outline-variant/50 bg-white px-5 text-sm font-medium outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
@@ -452,7 +452,7 @@ export function ProfilePage() {
               <h3 className="font-display text-xl font-black text-on-surface">Hero Interactions</h3>
             </div>
 
-            <div className="grid gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <p className="flex items-start gap-2 text-sm text-on-surface/55">
                 <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 Choose a saved contact or a page link; button label and URL are set together. Manage
@@ -463,7 +463,7 @@ export function ProfilePage() {
                 .
               </p>
 
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <Field
                   label="Primary button"
                   help="Usually your main chat channel (WhatsApp, Zalo, …)."
@@ -475,7 +475,7 @@ export function ProfilePage() {
                     presets={HERO_PAGE_PRESETS}
                   />
                   {primaryChoice === "custom" ? (
-                    <div className="mt-3 grid gap-3">
+                    <div className="mt-3 grid grid-cols-1 gap-3">
                       <input
                         className="h-12 w-full rounded-xl border border-outline-variant/50 bg-white px-4 text-sm font-medium outline-none focus:border-primary/50"
                         placeholder="Button label (English)"
@@ -545,7 +545,7 @@ export function ProfilePage() {
                     presets={HERO_PAGE_PRESETS}
                   />
                   {secondaryChoice === "custom" ? (
-                    <div className="mt-3 grid gap-3">
+                    <div className="mt-3 grid grid-cols-1 gap-3">
                       <input
                         className="h-12 w-full rounded-xl border border-outline-variant/50 bg-white px-4 text-sm font-medium outline-none focus:border-primary/50"
                         placeholder="Button label (English)"

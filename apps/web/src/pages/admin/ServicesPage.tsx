@@ -182,7 +182,7 @@ export function ServicesPage() {
                  </h3>
               </div>
 
-              <form onSubmit={handleSubmit} className="grid gap-6">
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6">
                  <Field label="Service Header">
                     <input
                       className="h-12 w-full rounded-xl border border-outline-variant/30 bg-surface-container/20 px-4 text-sm font-bold outline-none focus:bg-white focus:ring-4 focus:ring-primary/5 transition-all"

@@ -103,7 +103,7 @@ export function ClosingPage() {
         </div>
       </div>
 
-      <div className="grid gap-8">
+      <div className="grid grid-cols-1 gap-8">
          <Card className="p-8 border-none shadow-card bg-white overflow-hidden relative">
             <div className="absolute top-0 right-0 p-8 opacity-5">
                <Heart className="h-40 w-40" />
@@ -161,7 +161,7 @@ export function ClosingPage() {
                   />
                </Field>
 
-               <div className="grid gap-6 md:grid-cols-2">
+               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <Field label="Button Label">
                     <input
                       className="h-14 w-full rounded-2xl border border-outline-variant/30 bg-surface-container/20 px-6 text-sm font-bold outline-none focus:bg-white focus:ring-4 focus:ring-primary/5"

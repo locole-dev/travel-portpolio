@@ -681,7 +681,7 @@ export function HomestayPage() {
                 <h3 className="font-display text-xl font-black text-on-surface">Core Information</h3>
               </div>
 
-              <div className="grid gap-8">
+              <div className="grid grid-cols-1 gap-8">
                 <Field label="Section Title">
                    <input
                     className="h-14 w-full rounded-xl border border-outline-variant/30 bg-white px-5 text-base font-medium outline-none transition-all focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
@@ -792,7 +792,7 @@ export function HomestayPage() {
            </Card>
 
            {/* Quick Actions */}
-           <div className="grid gap-6 md:grid-cols-2">
+           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <button
                 type="button"
                 onClick={openLocationModal}

@@ -200,7 +200,7 @@ export function ContactsPage() {
                  </h3>
               </div>
 
-              <form onSubmit={handleSubmit} className="grid gap-6">
+              <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6">
                  <div className="grid grid-cols-2 gap-4">
                     <Field label="Platform">
                       <select

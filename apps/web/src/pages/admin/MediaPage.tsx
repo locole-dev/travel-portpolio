@@ -155,7 +155,7 @@ export function MediaPage() {
       <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[1fr_320px] min-w-0">
         {/* Gallery Grid */}
         <div className="space-y-6">
-           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {data.map((item) => (
                 <Card 
                   key={item.id} 
@@ -198,7 +198,7 @@ export function MediaPage() {
            {/* Upload Form */}
            <Card className="p-8 border-none shadow-card bg-white">
               <h3 className="font-display text-lg font-black text-on-surface mb-6">Quick Upload</h3>
-              <form onSubmit={handleUpload} className="grid gap-5">
+              <form onSubmit={handleUpload} className="grid grid-cols-1 gap-5">
                  <div className="relative group">
                     <input
                       className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
@@ -233,7 +233,7 @@ export function MediaPage() {
            {selectedId && (
               <Card className="p-8 border-none shadow-card bg-primary/5 animate-in fade-in slide-in-from-right-4 duration-300">
                  <h3 className="font-display text-lg font-black text-primary mb-6">Edit Asset</h3>
-                 <div className="grid gap-5">
+                 <div className="grid grid-cols-1 gap-5">
                     <Field label="Alt Text">
                        <textarea
                         className="min-h-24 w-full rounded-xl border border-primary/10 bg-white p-4 text-xs font-bold outline-none focus:ring-4 focus:ring-primary/5"

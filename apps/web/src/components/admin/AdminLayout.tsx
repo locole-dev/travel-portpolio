@@ -117,7 +117,7 @@ export function AdminLayout() {
       </aside>
 
       {/* ── Main Content ── */}
-      <div className="flex-1 lg:pl-[280px]">
+      <div className="flex-1 min-w-0 lg:pl-[280px]">
         {/* Top Header */}
         <header className="sticky top-0 z-30 flex h-20 items-center justify-between bg-surface/80 px-6 backdrop-blur-md lg:px-10">
           <div className="flex items-center gap-4 lg:gap-8">

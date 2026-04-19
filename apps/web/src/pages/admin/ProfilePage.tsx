@@ -280,7 +280,7 @@ export function ProfilePage() {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-tertiary">
           MANAGEMENT HUB
         </p>
-        <h2 className="mt-3 font-display text-5xl font-black tracking-tight text-on-surface">
+        <h2 className="mt-3 font-display text-4xl md:text-5xl font-black tracking-tight text-on-surface">
           Edit Public Profile
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-on-surface/50">
@@ -289,9 +289,9 @@ export function ProfilePage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-[300px_1fr]">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-8 lg:grid lg:grid-cols-[300px_1fr] min-w-0">
         {/* Sidebar: Profile Photo */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 min-w-0">
           <Card className="overflow-hidden p-6 text-center border-none shadow-card">
              <div className="relative mx-auto aspect-square w-full max-w-[200px] overflow-hidden rounded-[2.5rem] bg-surface-container">
                {form.avatarImage ? (
@@ -343,7 +343,7 @@ export function ProfilePage() {
                    Remove photo
                  </button>
                ) : null}
-               <p className="text-[10px] font-bold uppercase tracking-wider text-on-surface/30">
+               <p className="text-[10px] whitespace-normal font-bold uppercase tracking-wider text-on-surface/30 px-2 break-words">
                  JPG, PNG or WEBP. Max 5MB.<br />Square aspect ratio recommended.
                </p>
              </div>
@@ -364,8 +364,8 @@ export function ProfilePage() {
         </div>
 
         {/* Content Area */}
-        <div className="flex flex-col gap-8">
-          <Card className="relative overflow-hidden p-8 border-none shadow-card">
+        <div className="flex flex-col gap-8 min-w-0">
+          <Card className="relative overflow-hidden p-8 border-none shadow-card min-w-0">
             <div className="mb-8 flex items-center gap-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <User className="h-5 w-5" />

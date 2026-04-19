@@ -82,7 +82,7 @@ export function ClosingPage() {
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-tertiary">
             FINAL TOUCHES
           </p>
-          <h2 className="mt-3 font-display text-5xl font-black tracking-tight text-on-surface">
+          <h2 className="mt-3 font-display text-4xl md:text-5xl font-black tracking-tight text-on-surface">
             Closing Section
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-on-surface/50">

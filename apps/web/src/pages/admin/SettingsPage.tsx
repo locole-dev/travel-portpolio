@@ -15,7 +15,7 @@ export function SettingsPage() {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-tertiary">
           SYSTEM PREFERENCES
         </p>
-        <h2 className="mt-3 font-display text-5xl font-black tracking-tight text-on-surface">
+        <h2 className="mt-3 font-display text-4xl md:text-5xl font-black tracking-tight text-on-surface">
           Settings & Identity
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-on-surface/50">
@@ -24,7 +24,7 @@ export function SettingsPage() {
         </p>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
          {/* Account Card */}
          <Card className="p-8 border-none shadow-card bg-white relative overflow-hidden">
             <div className="absolute -top-10 -right-10 opacity-5">

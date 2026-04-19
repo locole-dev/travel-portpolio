@@ -130,7 +130,7 @@ export function MediaPage() {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-tertiary">
           ASSET MANAGEMENT
         </p>
-        <h2 className="mt-3 font-display text-5xl font-black tracking-tight text-on-surface">
+        <h2 className="mt-3 font-display text-4xl md:text-5xl font-black tracking-tight text-on-surface">
           Media Library
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-on-surface/50">
@@ -152,7 +152,7 @@ export function MediaPage() {
         </div>
       ) : null}
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+      <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[1fr_320px] min-w-0">
         {/* Gallery Grid */}
         <div className="space-y-6">
            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

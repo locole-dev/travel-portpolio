@@ -638,7 +638,7 @@ export function HomestayPage() {
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-tertiary">
             MANAGEMENT HUB
           </p>
-          <h2 className="mt-3 font-display text-5xl font-black tracking-tight text-on-surface">
+          <h2 className="mt-3 font-display text-4xl md:text-5xl font-black tracking-tight text-on-surface">
             TwentyNine Homestay
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-on-surface/50">
@@ -670,7 +670,7 @@ export function HomestayPage() {
         <p className="mb-6 text-sm font-bold text-red-600">{galleryError}</p>
       ) : null}
 
-      <div className="grid gap-8 lg:grid-cols-[1.1fr_minmax(0,0.9fr)]">
+      <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[1.1fr_minmax(0,0.9fr)] min-w-0">
         {/* Left: Section Details */}
         <div className="flex flex-col gap-8">
            <Card className="p-8 border-none shadow-card">
